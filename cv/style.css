@@ -1,0 +1,213 @@
+  * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0f0f1a 0%, #1a1a2e 100%);
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: #16213e;
+            display: flex;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .sidebar {
+            background: linear-gradient(135deg, #0f4c75 0%, #3282b8 100%);
+            color: white;
+            width: 40%;
+            padding: 40px 30px;
+        }
+
+        .main-content {
+            width: 60%;
+            padding: 40px;
+            background: #1a1a2e;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            color: #bbe1fa;
+            letter-spacing: 8px;
+            margin-bottom: 10px;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            color: #8892a0;
+        }
+
+        .about-section {
+            background: linear-gradient(135deg, #3282b8 0%, #0f4c75 100%);
+            padding: 25px;
+            border-radius: 20px 20px 100px 20px;
+            margin-bottom: 30px;
+        }
+
+        .about-section h2 {
+            font-size: 1.5em;
+            margin-bottom: 15px;
+        }
+
+        .about-section p {
+            line-height: 1.6;
+            font-size: 0.95em;
+        }
+
+        .contact-section, .qualities-section, .languages-section {
+            margin-bottom: 30px;
+        }
+
+        .contact-section h2, .qualities-section h2, .languages-section h2 {
+            font-size: 1.4em;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: start;
+            margin-bottom: 15px;
+            font-size: 0.9em;
+            line-height: 1.5;
+        }
+
+        .contact-item span {
+            margin-right: 10px;
+            font-size: 1.2em;
+        }
+
+        .qualities-section ul {
+            list-style: none;
+        }
+
+        .qualities-section li {
+            padding: 8px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .qualities-section li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #fff;
+            font-size: 1.5em;
+        }
+
+        .languages {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+        }
+
+        .language {
+            text-align: center;
+        }
+
+        .circle {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            border: 4px solid #bbe1fa;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 10px;
+            font-size: 1.3em;
+            font-weight: bold;
+        }
+
+        .section-title {
+            color: #3282b8;
+            font-size: 1.3em;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            margin: 30px 0 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3282b8;
+        }
+
+        .education-item, .work-item {
+            margin-bottom: 25px;
+        }
+
+        .item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .item-title {
+            font-weight: bold;
+            font-size: 1em;
+            color: #bbe1fa;
+        }
+
+        .item-date {
+            font-size: 0.9em;
+            color: #3282b8;
+            white-space: nowrap;
+        }
+
+        .item-details {
+            font-size: 0.9em;
+            color: #8892a0;
+            margin-bottom: 5px;
+        }
+
+        .item-details ul {
+            margin-left: 20px;
+            margin-top: 8px;
+        }
+
+        .item-details li {
+            margin-bottom: 5px;
+            color: #8892a0;
+        }
+
+        .skills-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .skills-grid li {
+            list-style: none;
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+            color: #8892a0;
+        }
+
+        .skills-grid li:before {
+            content: "•";
+            position: absolute;
+            left: 0;
+            color: #3282b8;
+            font-size: 1.5em;
+        }
+
+        @media print {
+            body {
+                background: #1a1a2e;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+            }
+        }
