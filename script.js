@@ -1,6 +1,6 @@
 
 // ==========================================
-// 1. Animation au scroll (Fade In des sections)
+// 1. Animation au scroll   
 // ==========================================
 const observerOptions = {
     threshold: 0.1,
@@ -38,7 +38,7 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
 });
 
 // ==========================================
-// 3. Effet de typing sur le titre (optionnel)
+// 3. Effet de typing sur le titre 
 // ==========================================
 function typeWriter(element, text, speed = 50) {
     let i = 0;
@@ -78,7 +78,7 @@ scrollTopBtn.addEventListener('click', () => {
 });
 
 // ==========================================
-// 5. Animation des cartes au hover (effet 3D)
+// 5. Animation des cartes au hover
 // ==========================================
 document.querySelectorAll('.project-card, .info-card').forEach(card => {
     card.addEventListener('mousemove', (e) => {
@@ -119,22 +119,4 @@ function updateCountdown() {
 }
 updateCountdown();
 
-// ==========================================
-// 7. Easter egg - Konami Code
-// ==========================================
-let konamiCode = [];
-const konamiSequence = ['ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight', 'b', 'a'];
 
-document.addEventListener('keydown', (e) => {
-    konamiCode.push(e.key);
-    konamiCode = konamiCode.slice(-10);
-    
-    if (konamiCode.join(',') === konamiSequence.join(',')) {
-        document.body.style.animation = 'rainbow 2s ease-in-out';
-        setTimeout(() => {
-            document.body.style.animation = '';
-        }, 2000);
-    }
-});
-
-console.log('🚀 Portfolio Martino Ismaël - Prêt pour le stage !');
