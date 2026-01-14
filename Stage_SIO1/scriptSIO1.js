@@ -4,21 +4,24 @@
 // ==========================================
 const observerOptions = {
     threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px'
+    rootMargin: '0px 0px 0px 0px'
 };
 
 const fadeInObserver = new IntersectionObserver((entries) => {
     entries.forEach(entry => {
         if (entry.isIntersecting) {
             entry.target.classList.add('visible');
+            fadeInObserver.unobserve(entry.target); // Stop observing once visible
         }
     });
 }, observerOptions);
 
-// Observer toutes les sections et cartes
-document.querySelectorAll('section, .info-card, .project-card, .motivation-item, .contact-card').forEach(el => {
-    el.classList.add('fade-in');
-    fadeInObserver.observe(el);
+// Observer seulement les cartes (pas les sections entières)
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.info-card, .project-card, .motivation-item, .contact-card').forEach(el => {
+        el.classList.add('fade-in');
+        fadeInObserver.observe(el);
+    });
 });
 
 // ==========================================
@@ -78,23 +81,32 @@ scrollTopBtn.addEventListener('click', () => {
 });
 
 // ==========================================
-// 5. Animation des cartes au hover
+// 5. Animation des cartes au hover (effet 3D)
 // ==========================================
-document.querySelectorAll('.project-card, .info-card').forEach(card => {
-    card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = (y - centerY) / 20;
-        const rotateY = (centerX - x) / 20;
+document.addEventListener('DOMContentLoaded', () => {
+    document.querySelectorAll('.project-card, .info-card').forEach(card => {
+        card.addEventListener('mouseenter', () => {
+            card.style.transition = 'none';
+        });
         
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-5px)`;
-    });
-    
-    card.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0)';
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = (y - centerY) / 15;
+            const rotateY = (centerX - x) / 15;
+            
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px) scale(1.02)`;
+            card.style.boxShadow = '0 20px 40px rgba(0, 217, 255, 0.3)';
+        });
+        
+        card.addEventListener('mouseleave', () => {
+            card.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0) scale(1)';
+            card.style.boxShadow = '';
+        });
     });
 });
 

@@ -4,8 +4,19 @@
     box-sizing: border-box;
 }
 
+:root {
+    --primary: #1a1a2e;
+    --secondary: #16213e;
+    --accent: #0f4c75;
+    --highlight: #3282b8;
+    --light: #bbe1fa;
+    --dark: #0f0f1a;
+    --text-muted: #8892a0;
+}
+
 html {
     background: #1a1a2e;
+    overflow-x: hidden;
 }
 
 body {
@@ -14,7 +25,82 @@ body {
     background-attachment: fixed;
     color: #ffffff;
     line-height: 1.6;
+    overflow-x: hidden;
 }
+
+nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    background: rgba(15, 15, 26, 0.95);
+    backdrop-filter: blur(12px);
+    padding: 14px 0;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 20px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+}
+
+.brand {
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #e8e8e8;
+    font-size: 1.2em;
+}
+
+.brand span {
+    color: var(--highlight);
+}
+
+.nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+}
+
+nav ul {
+    display: flex;
+    justify-content: center;
+    list-style: none;
+    gap: 30px;
+}
+
+nav a {
+    color: #e8e8e8;
+    text-decoration: none;
+    font-size: 1.1em;
+    transition: all 0.3s ease;
+    position: relative;
+    padding: 5px 10px;
+}
+
+nav a.active {
+    color: var(--highlight);
+}
+
+nav a:before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: var(--highlight);
+    transition: width 0.3s ease;
+}
+
+nav a:hover:before {
+    width: 100%;
+}
+
+nav a:hover {
+    color: var(--highlight);
+}
+
 
 .container {
     max-width: 1200px;
@@ -334,8 +420,9 @@ footer a:hover {
 /* Animation Fade In au scroll */
 .fade-in {
     opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+    transform: translateY(20px);
+    transition: opacity 0.5s ease-out, transform 0.5s ease-out;
+    will-change: opacity, transform;
 }
 
 .fade-in.visible {

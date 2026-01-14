@@ -39,7 +39,7 @@ window.addEventListener('scroll', () => {
         navbar.classList.remove('scrolled');
     }
 
-   
+
     const scrollTop = document.getElementById('scrollTop');
     if (window.scrollY > 500) {
         scrollTop.classList.add('visible');
@@ -128,3 +128,31 @@ if (document.readyState === 'complete') {
 } else {
     window.addEventListener('load', createParticles);
 }
+
+// ==========================================
+// 5. Animation des cartes au hover (effet 3D)
+// ==========================================
+document.querySelectorAll('.project-card').forEach(card => {
+    card.addEventListener('mouseenter', () => {
+        card.style.transition = 'none';
+    });
+
+    card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const centerX = rect.width / 2;
+        const centerY = rect.height / 2;
+        const rotateX = (y - centerY) / 15;
+        const rotateY = (centerX - x) / 15;
+
+        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px) scale(1.02)`;
+        card.style.boxShadow = '0 20px 40px rgba(0, 217, 255, 0.3)';
+    });
+
+    card.addEventListener('mouseleave', () => {
+        card.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
+        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0) scale(1)';
+        card.style.boxShadow = '';
+    });
+});
