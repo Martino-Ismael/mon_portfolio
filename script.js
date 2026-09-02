@@ -1,158 +1,112 @@
-function createParticles() {
-    const container = document.getElementById('particles');
-    const particleCount = 50;
+// Année du footer
+document.getElementById('footerYear').textContent = new Date().getFullYear();
 
-    for (let i = 0; i < particleCount; i++) {
-        const particle = document.createElement('div');
-        particle.className = 'particle';
-        particle.style.width = Math.random() * 5 + 2 + 'px';
-        particle.style.height = particle.style.width;
-        particle.style.left = Math.random() * 100 + '%';
-        particle.style.top = Math.random() * 100 + '%';
-        particle.style.animationDelay = Math.random() * 6 + 's';
-        particle.style.animationDuration = Math.random() * 4 + 4 + 's';
-        container.appendChild(particle);
-    }
-}
+// Respect du mode "mouvement réduit"
+const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-
-const navLinks = document.querySelectorAll('a[href^="#"]');
-
-navLinks.forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-    });
-});
-
-
-const sections = document.querySelectorAll('section');
-
-window.addEventListener('scroll', () => {
-    const navbar = document.getElementById('navbar');
-    if (window.scrollY > 100) {
-        navbar.classList.add('scrolled');
-    } else {
-        navbar.classList.remove('scrolled');
-    }
-
-
-    const scrollTop = document.getElementById('scrollTop');
-    if (window.scrollY > 500) {
-        scrollTop.classList.add('visible');
-    } else {
-        scrollTop.classList.remove('visible');
-    }
-
-    // Active link highlight
-    sections.forEach(section => {
-        const rect = section.getBoundingClientRect();
-        if (rect.top <= 120 && rect.bottom >= 120) {
-            navLinks.forEach(link => link.classList.remove('active'));
-            const current = document.querySelector(`nav a[href="#${section.id}"]`);
-            if (current) current.classList.add('active');
-        }
-    });
-});
-
-// Scroll to top
-document.getElementById('scrollTop').addEventListener('click', () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-});
-
-// Animation des barres de compétences
-const observerOptions = {
-    threshold: 0.5,
-    rootMargin: '0px'
-};
-
-const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-        if (entry.isIntersecting) {
-            const progressBars = entry.target.querySelectorAll('.skill-progress');
-            progressBars.forEach(bar => {
-                const progress = bar.getAttribute('data-progress');
-                setTimeout(() => {
-                    bar.style.width = progress + '%';
-                }, 200);
-            });
-            observer.unobserve(entry.target);
-        }
-    });
-}, observerOptions);
-
-const skillsSection = document.getElementById('skills');
-if (skillsSection) {
-    observer.observe(skillsSection);
-}
-
-// Animation des cartes projet au survol
-document.querySelectorAll('.project-card').forEach(card => {
-    card.addEventListener('mouseenter', function () {
-        this.style.background = 'rgba(74, 158, 255, 0.1)';
-    });
-    card.addEventListener('mouseleave', function () {
-        this.style.background = 'rgba(255, 255, 255, 0.05)';
-    });
-});
-
-
-const title = document.querySelector('.hero h1');
-const text = title.textContent;
-title.textContent = '';
-let i = 0;
-
-function typeWriter() {
-    if (i < text.length) {
-        title.textContent += text.charAt(i);
+// --- Effet de frappe dans le terminal du héro ---
+const typedEl = document.getElementById('typedText');
+const phrase = "cat objectif.txt";
+if (typedEl) {
+  if (reduceMotion) {
+    typedEl.textContent = phrase;
+  } else {
+    let i = 0;
+    const type = () => {
+      if (i <= phrase.length) {
+        typedEl.textContent = phrase.slice(0, i);
         i++;
-        setTimeout(typeWriter, 100);
+        setTimeout(type, 55);
+      }
+    };
+    type();
+  }
+}
+
+// --- Menu mobile ---
+const navToggle = document.getElementById('navToggle');
+const navMenu = document.getElementById('navMenu');
+if (navToggle && navMenu) {
+  navToggle.addEventListener('click', () => {
+    const open = navMenu.classList.toggle('open');
+    navToggle.setAttribute('aria-expanded', open ? 'true' : 'false');
+  });
+  navMenu.querySelectorAll('a').forEach(link => {
+    link.addEventListener('click', () => {
+      navMenu.classList.remove('open');
+      navToggle.setAttribute('aria-expanded', 'false');
+    });
+  });
+}
+
+// --- Bouton retour en haut ---
+const scrollTopBtn = document.getElementById('scrollTop');
+if (scrollTopBtn) {
+  window.addEventListener('scroll', () => {
+    scrollTopBtn.classList.toggle('visible', window.scrollY > 500);
+  }, { passive: true });
+
+  scrollTopBtn.addEventListener('click', () => {
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+  });
+}
+
+// --- Arrière-plan "réseau" animé dans le héro ---
+const canvas = document.getElementById('netCanvas');
+if (canvas && !reduceMotion) {
+  const ctx = canvas.getContext('2d');
+  let width, height, nodes;
+  const hero = canvas.closest('.hero');
+
+  function resize() {
+    width = canvas.width = hero.offsetWidth;
+    height = canvas.height = hero.offsetHeight;
+    const count = Math.min(70, Math.floor((width * height) / 18000));
+    nodes = Array.from({ length: count }, () => ({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.3,
+      vy: (Math.random() - 0.5) * 0.3
+    }));
+  }
+
+  function draw() {
+    ctx.clearRect(0, 0, width, height);
+
+    for (const n of nodes) {
+      n.x += n.vx;
+      n.y += n.vy;
+      if (n.x < 0 || n.x > width) n.vx *= -1;
+      if (n.y < 0 || n.y > height) n.vy *= -1;
     }
+
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < 130) {
+          ctx.strokeStyle = `rgba(232, 162, 61, ${0.12 * (1 - dist / 130)})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    for (const n of nodes) {
+      ctx.fillStyle = 'rgba(232, 162, 61, 0.5)';
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, 1.6, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  resize();
+  draw();
+  window.addEventListener('resize', resize, { passive: true });
 }
-
-setTimeout(typeWriter, 500);
-
-// Footer year
-const footerYear = document.getElementById('footerYear');
-if (footerYear) {
-    const year = new Date().getFullYear();
-    footerYear.innerHTML = `&copy; ${year} Martino Ismaël - Tous droits réservés`;
-}
-
-// Init particles when DOM is ready
-if (document.readyState === 'complete') {
-    createParticles();
-} else {
-    window.addEventListener('load', createParticles);
-}
-
-// ==========================================
-// 5. Animation des cartes au hover (effet 3D)
-// ==========================================
-document.querySelectorAll('.project-card').forEach(card => {
-    card.addEventListener('mouseenter', () => {
-        card.style.transition = 'none';
-    });
-
-    card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
-        const centerX = rect.width / 2;
-        const centerY = rect.height / 2;
-        const rotateX = (y - centerY) / 15;
-        const rotateY = (centerX - x) / 15;
-
-        card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateY(-8px) scale(1.02)`;
-        card.style.boxShadow = '0 20px 40px rgba(0, 217, 255, 0.3)';
-    });
-
-    card.addEventListener('mouseleave', () => {
-        card.style.transition = 'transform 0.3s ease, box-shadow 0.3s ease';
-        card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) translateY(0) scale(1)';
-        card.style.boxShadow = '';
-    });
-});
