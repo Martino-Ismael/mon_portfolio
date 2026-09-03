@@ -397,6 +397,67 @@ section h2::after {
   margin-bottom: 4px;
 }
 
+/* ===== Tableau de synthèse E5 ===== */
+.e5-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  margin-top: 36px;
+}
+.e5-table {
+  border-collapse: collapse;
+  width: 100%;
+  min-width: 760px;
+  font-size: 0.85rem;
+}
+.e5-table caption {
+  caption-side: top;
+  text-align: left;
+  font-family: var(--mono);
+  font-size: 0.8rem;
+  color: var(--accent);
+  padding: 14px 16px 0;
+}
+.e5-table th,
+.e5-table td {
+  border: 1px solid var(--border);
+  padding: 10px 12px;
+  text-align: center;
+  color: var(--muted);
+}
+.e5-table thead th {
+  background: var(--surface-2);
+  color: var(--text);
+  font-family: var(--mono);
+  font-weight: 500;
+  font-size: 0.78rem;
+  vertical-align: bottom;
+}
+.e5-table tbody th {
+  text-align: left;
+  color: var(--text);
+  font-weight: 500;
+  font-size: 0.85rem;
+  white-space: nowrap;
+  background: var(--surface);
+}
+.e5-table tbody tr:nth-child(even) td,
+.e5-table tbody tr:nth-child(even) th {
+  background: rgba(255,255,255,0.02);
+}
+.e5-table td.mark {
+  color: var(--accent);
+  font-weight: 600;
+}
+.table-note {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  margin: 14px 0 0;
+}
+.table-note a { color: var(--accent-dim); }
+.table-note a:hover { color: var(--accent); }
+
 /* ===== Disponibilité ===== */
 .availability-section {
   background: var(--surface);
