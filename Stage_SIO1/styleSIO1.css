@@ -106,6 +106,12 @@ section{padding:100px 0}
 .week-block-title{display:block;font-family:var(--mono);font-size:.8rem;color:var(--text);margin-bottom:4px}
 .week-block p{margin:0}
 
+.keyword-tags{display:flex;flex-wrap:wrap;gap:8px}
+.keyword-tags span{font-size:.82rem;color:var(--text);background:var(--surface-2);border:1px solid var(--border);padding:5px 12px;border-radius:20px}
+
+.week-competences{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
+.comp-tag{font-family:var(--mono);font-size:.72rem;color:var(--accent-dim);border:1px solid rgba(238,118,84,.35);background:rgba(238,118,84,.08);padding:4px 10px;border-radius:20px}
+
 /* ===== Stats ===== */
 .stats-row{display:flex;flex-wrap:wrap;justify-content:center;gap:40px;margin:36px 0 44px}
 .stat-item{text-align:center}
