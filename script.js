@@ -1,12 +1,13 @@
 // Année du footer
-document.getElementById('footerYear').textContent = new Date().getFullYear();
+const footerYear = document.getElementById('footerYear');
+if (footerYear) footerYear.textContent = new Date().getFullYear();
 
 // Respect du mode "mouvement réduit"
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
 // --- Effet de frappe dans le terminal du héro ---
 const typedEl = document.getElementById('typedText');
-const phrase = "cat objectif.txt";
+const phrase = "Bienvenue sur mon portfolio !";
 if (typedEl) {
   if (reduceMotion) {
     typedEl.textContent = phrase;
