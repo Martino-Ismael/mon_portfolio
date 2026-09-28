@@ -224,6 +224,7 @@ th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--bo
 th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; background: var(--surface-2); }
 tr:last-child td { border-bottom: 0; }
 td .mono { font-size: 12px; color: var(--muted); }
+.ev-note { margin: 14px 0 0; font-size: 13.5px; color: var(--muted); max-width: 820px; }
 
 /* Tests */
 .tests { padding: 22px; }
@@ -450,6 +451,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
         </tbody>
       </table>
     </div>
+    <p class="ev-note" data-i18n="ev.note"></p>
   </div>
 </section>
 
@@ -573,6 +575,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       "ev.r3": "withdraw 50 tKAS, UTXO 55 DAA old", "ev.r4": "withdraw 150 tKAS (over the cap)", "ev.r5": "withdrawAll before 3 days",
       "ev.r6": "recoverByInactivity before 180 days", "ev.r7": "recoverByDeadline before 2030", "ev.r8": "withdraw 50 tKAS after 1 day",
       "ev.scheduled": "⏳ scheduled",
+      "ev.note": "Note: the public Testnet-10 indexer used by block explorers has been stalled since 26 September 2026, so these transactions may show as \"not found\" there for now. The two deposits can be checked live in the <a href=\"#live\">dashboard above</a>: UTXOs ec11f64a… and c311eaf8… are read directly from a Kaspa node, and a UTXO only exists if its transaction was accepted.",
       "ev.d1": "Demo vault · withdraw 2 tKAS after the cooldown, change back to the vault",
       "ev.d2": "Demo vault · withdrawAll after 3 × cooldown",
       "ev.d3": "Demo vault · recoverByInactivity, signed by the backup key",
@@ -640,6 +643,7 @@ footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wr
       "ev.r3": "withdraw de 50 tKAS, UTXO âgé de 55 DAA", "ev.r4": "withdraw de 150 tKAS (au-dessus du plafond)", "ev.r5": "withdrawAll avant 3 jours",
       "ev.r6": "recoverByInactivity avant 180 jours", "ev.r7": "recoverByDeadline avant 2030", "ev.r8": "withdraw de 50 tKAS après 1 jour",
       "ev.scheduled": "⏳ programmé",
+      "ev.note": "Note : l'indexeur public de Testnet-10, utilisé par les explorateurs de blocs, est bloqué depuis le 26 septembre 2026 ; ces transactions peuvent donc y apparaître comme « introuvables » pour le moment. Les deux dépôts sont vérifiables en direct dans le <a href=\"#live\">tableau de bord ci-dessus</a> : les UTXO ec11f64a… et c311eaf8… sont lus directement dans un nœud Kaspa, et un UTXO n'existe que si sa transaction a été acceptée.",
       "ev.d1": "Coffre de démo · withdraw de 2 tKAS après le délai, reliquat renvoyé au coffre",
       "ev.d2": "Coffre de démo · withdrawAll après 3 × le délai",
       "ev.d3": "Coffre de démo · recoverByInactivity, signé par la clé de secours",
