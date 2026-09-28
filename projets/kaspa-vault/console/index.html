@@ -1,0 +1,461 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Console du coffre Kaspa | Martino Ismaël</title>
+<meta name="description" content="Console web du coffre Kaspa : données en direct sur Testnet-10 et rejeu de la session réelle où les 4 chemins de dépense ont été validés.">
+<meta name="theme-color" content="#f6f6f3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%233a4048'/%3E%3Ctext x='50' y='66' font-family='monospace' font-weight='700' font-size='46' fill='%23ffffff' text-anchor='middle'%3EMI%3C/text%3E%3Crect x='22' y='76' width='56' height='6' fill='%234fbf8a'/%3E%3C/svg%3E">
+<script src="../../../theme.js"></script>
+<style>
+:root {
+  --bg: #f6f6f3; --surface: #ffffff; --surface-2: #eeeeea; --border: #dedfdb;
+  --text: #2a2f36; --muted: #6a717b; --accent: #0b5d3b; --accent-soft: #e6efe9;
+  --ok: #1a7f47; --ok-soft: #dcf0e3; --warn: #8a5a00; --warn-soft: #f6ecd6; --bad: #b03a2e; --bad-soft: #f6e1de;
+  --strong: #3a4048; color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1e22; --surface: #23272c; --surface-2: #2a2f35; --border: #33383e;
+    --text: #eceae6; --muted: #979ea6; --accent: #5cc493; --accent-soft: #16291f;
+    --ok: #5cc493; --ok-soft: #16291f; --warn: #e5b45a; --warn-soft: #33291a; --bad: #ec8b7f; --bad-soft: #3a2220;
+    --strong: #eceae6; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1b1e22; --surface: #23272c; --surface-2: #2a2f35; --border: #33383e;
+  --text: #eceae6; --muted: #979ea6; --accent: #5cc493; --accent-soft: #16291f;
+  --ok: #5cc493; --ok-soft: #16291f; --warn: #e5b45a; --warn-soft: #33291a; --bad: #ec8b7f; --bad-soft: #3a2220;
+  --strong: #eceae6; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 "IBM Plex Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.mono, code { font-family: "IBM Plex Mono", ui-monospace, Menlo, monospace; }
+a { color: var(--accent); }
+button, select { font: inherit; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 16px; }
+h1, h2, h3 { letter-spacing: -.02em; }
+
+header.top { position: sticky; top: 0; z-index: 5; background: color-mix(in srgb, var(--bg) 90%, transparent); backdrop-filter: blur(10px); border-bottom: 1px solid var(--border); }
+header.top .wrap { display: flex; align-items: center; gap: 12px; min-height: 60px; flex-wrap: wrap; padding-top: 8px; padding-bottom: 8px; }
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text); margin-right: auto; }
+.brand-mark { display: inline-grid; place-items: center; width: 30px; height: 30px; background: #3a4048; color: #fff; font: 600 12px "IBM Plex Mono", monospace; position: relative; }
+.brand-mark::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: 4px; height: 2px; background: #1f9d61; }
+.brand small { font: 500 13px "IBM Plex Mono", monospace; color: var(--muted); }
+.brand b { font-weight: 600; }
+select { border: 1px solid var(--border); background: var(--surface); color: var(--text); padding: 6px 8px; }
+.lang-switch { display: inline-flex; border: 1px solid var(--accent); }
+.lang-switch button { font: 500 12px "IBM Plex Mono", monospace; letter-spacing: .04em; padding: 5px 9px; border: 0; background: transparent; color: var(--accent); cursor: pointer; }
+.lang-switch button[aria-pressed="true"] { background: var(--accent); color: var(--bg); }
+.theme-toggle { display: inline-grid; place-items: center; width: 30px; height: 28px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; }
+.theme-toggle:hover, .lang-switch button:not([aria-pressed="true"]):hover { background: var(--accent-soft); }
+
+.notice { display: flex; gap: 12px; align-items: flex-start; margin: 20px 0 0; padding: 12px 16px; border: 1px solid var(--border); border-left: 3px solid var(--accent); background: var(--surface); font-size: 14px; }
+.notice b { font-weight: 600; }
+.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin: 16px 0 12px; }
+.card { background: var(--surface); border: 1px solid var(--border); }
+.stat { padding: 14px 16px; }
+.stat .l { font: 500 11.5px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.stat .num { font-size: 22px; font-weight: 600; margin-top: 4px; letter-spacing: -.02em; }
+.stat .num small { font-size: 13px; color: var(--muted); font-weight: 400; }
+.addr { display: flex; gap: 10px; align-items: center; padding: 10px 14px; flex-wrap: wrap; }
+.addr .mono { font-size: 12.5px; word-break: break-all; flex: 1 1 300px; }
+.tag { font: 500 11px "IBM Plex Mono", monospace; padding: 2px 8px; background: var(--accent-soft); color: var(--accent); }
+.tag.grey { background: var(--surface-2); color: var(--muted); }
+.btn { border: 1px solid var(--strong); background: transparent; color: var(--text); padding: 7px 12px; font-weight: 500; cursor: pointer; white-space: nowrap; text-decoration: none; display: inline-flex; align-items: center; gap: 6px; }
+.btn:hover { background: var(--strong); color: var(--bg); }
+.btn.solid { background: var(--accent); border-color: var(--accent); color: #fff; }
+:root[data-theme="dark"] .btn.solid { color: var(--bg); }
+.btn.small { padding: 4px 10px; font-size: 13px; }
+.btn:disabled { opacity: .45; cursor: not-allowed; background: transparent; color: var(--text); }
+
+.layout { display: grid; grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); gap: 18px; margin: 18px 0 40px; align-items: start; }
+.side { position: sticky; top: 76px; display: flex; flex-direction: column; gap: 14px; max-height: calc(100vh - 92px); overflow: auto; }
+h2 { font-size: 17px; margin: 0 0 8px; font-weight: 600; }
+.hint { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+.path { padding: 14px 16px; margin-bottom: 10px; }
+.path-head { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.path-head h3 { margin: 0; font: 600 15px "IBM Plex Mono", monospace; }
+.who { font-size: 12px; color: var(--muted); }
+.pill { margin-left: auto; font: 500 12px "IBM Plex Mono", monospace; padding: 2px 8px; white-space: nowrap; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.wait { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+.path p { margin: 6px 0 10px; color: var(--muted); font-size: 13.5px; }
+.bar { height: 6px; background: var(--surface-2); overflow: hidden; margin: 2px 0 10px; }
+.bar i { display: block; height: 100%; background: var(--accent); transition: width .8s linear; }
+.bar i.done { background: var(--ok); }
+.path .row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.locked { font-size: 12.5px; color: var(--muted); }
+
+.panel { padding: 16px; }
+.result { padding: 10px 12px; font-weight: 500; font-size: 14px; margin-bottom: 12px; }
+.result.ok { background: var(--ok-soft); color: var(--ok); }
+.result.bad { background: var(--bad-soft); color: var(--bad); }
+.result.info { background: var(--surface-2); color: var(--muted); }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 3px 12px; font-size: 13px; margin: 0 0 10px; }
+.kv dt { color: var(--muted); } .kv dd { margin: 0; word-break: break-all; }
+table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 10px; }
+th, td { text-align: left; padding: 6px 4px; border-bottom: 1px solid var(--border); }
+th { font: 500 11px "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: .05em; color: var(--muted); }
+details { font-size: 12px; color: var(--muted); }
+details pre { white-space: pre-wrap; word-break: break-all; background: var(--surface-2); padding: 8px; }
+
+.steps { list-style: none; margin: 10px 0 0; padding: 0; max-height: 330px; overflow: auto; }
+.steps li { display: grid; grid-template-columns: 20px 52px 1fr; gap: 8px; align-items: baseline; padding: 7px 4px; border-top: 1px solid var(--border); cursor: pointer; font-size: 13px; }
+.steps li:hover { background: var(--surface-2); }
+.steps li.cur { background: var(--accent-soft); }
+.steps .when { font: 400 12px "IBM Plex Mono", monospace; color: var(--muted); }
+.steps .mk.ok { color: var(--ok); } .steps .mk.bad { color: var(--bad); }
+.player { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.attack { display: flex; gap: 10px; align-items: center; padding: 8px 0; border-top: 1px solid var(--border); font-size: 13.5px; }
+.attack:first-of-type { border-top: 0; }
+.attack div { flex: 1; } .attack small { display: block; color: var(--muted); }
+.empty { color: var(--muted); font-size: 13px; }
+footer { border-top: 1px solid var(--border); padding: 20px 0 36px; color: var(--muted); font-size: 13px; }
+@media (max-width: 980px) { .layout { grid-template-columns: 1fr; } .side { position: static; max-height: none; } }
+@media (max-width: 640px) { .stats { grid-template-columns: 1fr 1fr; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">MI</span><small data-i18n="nav.back">← Étude de cas</small> <b data-i18n="title">Console du coffre</b></a>
+    <select id="vaultSel" aria-label="Coffre"></select>
+    <div class="lang-switch" role="group" aria-label="Langue / Language"><button type="button" data-lang="fr" aria-pressed="true">FR</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
+    <button class="theme-toggle" type="button" aria-label="Thème clair / sombre · Light / dark theme" aria-pressed="false"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg></button>
+  </div>
+</header>
+
+<main class="wrap">
+  <div class="notice"><span aria-hidden="true">🔒</span><div data-i18n="notice"></div></div>
+
+  <div class="stats">
+    <div class="card stat"><div class="l" data-i18n="s.bal">Solde du coffre</div><div class="num" id="sBal">…</div></div>
+    <div class="card stat"><div class="l" data-i18n="s.owner">Wallet owner</div><div class="num" id="sOwner">…</div></div>
+    <div class="card stat"><div class="l" data-i18n="s.daa">Score DAA</div><div class="num" id="sDaa">…</div></div>
+    <div class="card stat"><div class="l" data-i18n="s.cap">Plafond / withdraw</div><div class="num" id="sCap">…</div></div>
+  </div>
+  <div class="card addr">
+    <span class="tag" data-i18n="addr">Adresse du coffre</span>
+    <span class="mono" id="addr">…</span>
+    <a class="btn small" id="explorer" target="_blank" rel="noopener" data-i18n="explorer">Explorateur ↗</a>
+  </div>
+
+  <div class="layout">
+    <section>
+      <h2 data-i18n="paths.title">Chemins de dépense</h2>
+      <p class="hint" id="pathsHint"></p>
+      <div id="paths"></div>
+      <h2 style="margin-top:20px" data-i18n="utxo.title">UTXO du coffre</h2>
+      <div class="card" style="padding:4px 14px"><table><thead><tr><th>UTXO</th><th data-i18n="utxo.amount">Montant</th><th data-i18n="utxo.age">Âge</th></tr></thead><tbody id="utxoRows"></tbody></table></div>
+    </section>
+
+    <aside class="side">
+      <div class="card panel">
+        <h2 data-i18n="insp.title">Inspecteur de transaction</h2>
+        <div id="inspector"></div>
+      </div>
+      <div class="card panel">
+        <h2 data-i18n="replay.title">Rejouer la session du 27/09</h2>
+        <p class="hint" data-i18n="replay.hint"></p>
+        <div class="player">
+          <button class="btn solid" id="playBtn" type="button" data-i18n="replay.play">▶ Rejouer</button>
+          <button class="btn small" id="prevBtn" type="button" aria-label="Étape précédente">←</button>
+          <button class="btn small" id="nextBtn" type="button" aria-label="Étape suivante">→</button>
+          <span class="who" id="stepCount"></span>
+        </div>
+        <ol class="steps" id="steps"></ol>
+      </div>
+      <div class="card panel">
+        <h2 data-i18n="att.title">Tester les protections</h2>
+        <p class="hint" data-i18n="att.hint"></p>
+        <div id="attacks"></div>
+      </div>
+    </aside>
+  </div>
+</main>
+<footer><div class="wrap" data-i18n="footer"></div></footer>
+
+<script>
+(() => {
+  const SOMPI = 1e8, DAA_PER_SEC = 10, REFRESH_MS = 15000;
+  const API = "https://api-tn10.kaspa.org", EXPLORER = "https://tn10.kaspa.stream";
+  const OWNER = "kaspatest:qpmvvc7m0ef43pepqjh2nkvqmudrqdy3fa2n8r0n3uffjt9ytkglzdguzgsyt";
+  const VAULTS = {
+    main: { address: "kaspatest:pra2t9p22r0jse30uu66937z7z8sg0qt5c3se4xac7jw98yqutt4wrly4z4eg", cooldown: 864000, inactivity: 155520000, deadline: 1893456000000, cap: 10000000000 },
+    demo: { address: "kaspatest:pz67tkcftq60yg6cl5efnudxn2gjf9khdpmcj32p0jpmjnpvupl2ke3srynfs", cooldown: 300, inactivity: 1800, deadline: 1790521707000, cap: 500000000 },
+  };
+
+  // ---- Session reelle du 27/09/2026 (coffre demo-1790521107), extraite du journal de la console locale ----
+  const E = (fr, en) => ({ fr, en });
+  const MSG = {
+    acc: E("Transaction acceptée par le réseau Testnet-10.", "Transaction accepted by the Testnet-10 network."),
+    contract: E("Refusé par le contrat : une condition require() est fausse.", "Rejected by the contract: a require() condition is false."),
+    seq: E("Refusé par le réseau : le délai relatif (ageDaa) de l'UTXO n'est pas écoulé.", "Rejected by the network: the UTXO's relative delay (ageDaa) has not elapsed."),
+    fin: E("Refusé par le réseau : l'échéance absolue (tx.time) n'est pas atteinte.", "Rejected by the network: the absolute deadline (tx.time) has not been reached."),
+  };
+  const LOCAL_ERR = "verification locale de l'input 0 echouee: script ran, but verification failed";
+  const SESSION = [
+    { at: "2026-09-27T14:58:28Z", action: "create", ok: true, info: E("Coffre de démo créé : withdraw ~30 s, withdrawAll ~90 s, secours ~3 min, échéance 10 min plus tard, plafond 5 tKAS.", "Demo vault created: withdraw ~30 s, withdrawAll ~90 s, recovery ~3 min, deadline 10 min later, cap 5 tKAS.") },
+    { at: "2026-09-27T14:58:33Z", action: "deposit", ok: true, msg: "acc", txid: "39cb00eb2da724f3ce6f87fd0dbcb6dd7c03ad55b031fabb0852c0afbc36417e", fee: 225171, signer: "owner", outputs: [[2000000000, "vault"]] },
+    { at: "2026-09-27T14:59:15Z", action: "withdraw", ok: true, msg: "acc", txid: "3b8dd4b924e9986e83d181aa0c7beeaf778a07c18ac20a4abc00cf1a767a5ffd", fee: 556050, signer: "owner", seq: 300, input: 2000000000, outputs: [[200000000, "owner"], [1799443950, "vault"]], note: E("UTXO âgé de 364 DAA ≥ 300 : le délai est écoulé. Le reste revient exactement au coffre.", "UTXO aged 364 DAA ≥ 300: the delay has elapsed. The change goes back to the exact same vault.") },
+    { at: "2026-09-27T14:59:35Z", action: "withdraw", ok: false, msg: "contract", stage: "local", attack: "cap", detail: LOCAL_ERR, note: E("Tentative de 6 tKAS alors que le plafond est de 5 tKAS : refusée avant même l'envoi.", "Attempt to withdraw 6 tKAS with a 5 tKAS cap: rejected before being sent.") },
+    { at: "2026-09-27T14:59:38Z", action: "withdraw", ok: false, msg: "seq", stage: "network", attack: "early", txid: "8d2c9c9afcc8752a4d0a669cd3cfaf29b2925a4462f8e1b9654c7a81475d4cea", detail: "one of the transaction sequence locks conditions was not met", note: E("Le reste du retrait précédent est un nouvel UTXO : son horloge est repartie de zéro.", "The previous withdrawal's change is a new UTXO: its clock restarted from zero.") },
+    { at: "2026-09-27T14:59:40Z", action: "recoverByDeadline", ok: false, msg: "contract", stage: "local", attack: "wrongkey", detail: LOCAL_ERR, note: E("Chemin de secours signé avec la clé owner : une clé owner volée ne peut pas l'utiliser.", "Recovery path signed with the owner key: a stolen owner key cannot use it.") },
+    { at: "2026-09-27T14:59:42Z", action: "withdraw", ok: false, msg: "contract", stage: "local", attack: "fee", detail: LOCAL_ERR, note: E("Frais de 0,2 tKAS alors que le maximum est de 0,1 tKAS : un voleur ne peut pas brûler le solde en frais.", "0.2 tKAS fee with a 0.1 tKAS maximum: a thief cannot burn the balance in fees.") },
+    { at: "2026-09-27T14:59:46Z", action: "withdrawAll", ok: false, msg: "seq", stage: "network", attack: "sweep", txid: "1de9ad851851e99c75f1a7bb489a35fcb44cbff56b322624d030e33cb1af52fd", detail: "one of the transaction sequence locks conditions was not met", note: E("withdrawAll exige 3 fois le délai de withdraw.", "withdrawAll requires 3 times the withdraw delay.") },
+    { at: "2026-09-27T14:59:50Z", action: "deposit", ok: true, msg: "acc", txid: "70e8d1eaa071c6be6a5975b995b136dc0ccec6dd7023a9d4b019be255a9928a2", fee: 348150, signer: "owner", outputs: [[500000000, "vault"]] },
+    { at: "2026-09-27T15:01:01Z", action: "withdrawAll", ok: true, msg: "acc", txid: "1de9ad851851e99c75f1a7bb489a35fcb44cbff56b322624d030e33cb1af52fd", fee: 217471, signer: "owner", seq: 900, input: 1799443950, outputs: [[1799226479, "owner"]], note: E("La même transaction que la tentative refusée plus tôt, désormais acceptée : l'UTXO a 994 DAA.", "The same transaction as the earlier rejected attempt, now accepted: the UTXO is 994 DAA old.") },
+    { at: "2026-09-27T15:03:07Z", action: "recoverByInactivity", ok: true, msg: "acc", txid: "219ebe44008cd37c73c9e579e284e402f9afa110088d30c1fc9d5a630c32cb12", fee: 217471, signer: "recovery", seq: 1800, input: 500000000, outputs: [[499782529, "recovery"]], note: E("Signé par la clé de secours après 1 877 DAA d'inactivité.", "Signed by the recovery key after 1,877 DAA of inactivity.") },
+    { at: "2026-09-27T15:03:20Z", action: "deposit", ok: true, msg: "acc", txid: "179f67ac6761805159307259d8739fd3a40bb634641cefe195fff39bd7d57ab8", fee: 348150, signer: "owner", outputs: [[300000000, "vault"]] },
+    { at: "2026-09-27T15:03:43Z", action: "recoverByDeadline", ok: false, msg: "fin", stage: "network", txid: "e92667fd9a7eb4cb2d682f039897c1548f51433ff75932c0f9bbf3d31a68b7c6", detail: "transaction input #0 is not finalized", note: E("Avant l'échéance : refusée (6 essais en 7 minutes).", "Before the deadline: rejected (6 attempts over 7 minutes).") },
+    { at: "2026-09-27T15:10:51Z", action: "recoverByDeadline", ok: true, msg: "acc", txid: "e92667fd9a7eb4cb2d682f039897c1548f51433ff75932c0f9bbf3d31a68b7c6", fee: 217471, signer: "recovery", seq: 0, lockTime: 1790521707000, input: 300000000, outputs: [[299782529, "recovery"]], note: E("Acceptée ~2 min après l'échéance (le réseau compare au temps médian passé), sur un UTXO de quelques minutes : l'attaque « goutte-à-goutte » ne peut pas bloquer ce chemin.", "Accepted ~2 min after the deadline (the network compares against past median time), on a UTXO only minutes old: the drip attack cannot block this path.") },
+  ];
+
+  const I18N = {
+    fr: {
+      "nav.back": "← Étude de cas", title: "Console du coffre",
+      notice: "<b>Version en ligne, en lecture seule.</b> La vraie console tourne en local : elle signe avec des clés qui ne quittent jamais ma machine. Ici, les soldes et les délais sont lus en direct sur Testnet-10, et la session réelle du 27/09 peut être rejouée pas à pas.",
+      "s.bal": "Solde du coffre", "s.owner": "Wallet owner", "s.daa": "Score DAA", "s.cap": "Plafond / withdraw",
+      addr: "Adresse du coffre", explorer: "Explorateur ↗",
+      "paths.title": "Chemins de dépense", "utxo.title": "UTXO du coffre", "utxo.amount": "Montant", "utxo.age": "Âge",
+      "insp.title": "Inspecteur de transaction", "replay.title": "Rejouer la session du 27/09",
+      "replay.hint": "Coffre de démo aux délais courts : les 4 chemins acceptés par le réseau et 5 attaques refusées, en 13 minutes.",
+      "replay.play": "▶ Rejouer", "replay.pause": "❚❚ Pause",
+      "att.title": "Tester les protections", "att.hint": "Résultat réel de chaque attaque lors de la session.",
+      footer: "Martino Ismaël · Coffre SilverScript sur Kaspa Testnet-10 · <a href=\"../index.html\">Étude de cas</a>",
+      "vault.main": "Coffre principal", "vault.demo": "Coffre de démo (27/09)",
+      hint: (p) => `Délais : withdraw ≈ ${dur(p.cooldown / DAA_PER_SEC)}, withdrawAll ≈ ${dur(p.cooldown * 3 / DAA_PER_SEC)}, inactivité ≈ ${dur(p.inactivity / DAA_PER_SEC)}, échéance le ${new Date(p.deadline).toLocaleString("fr-FR")}. Les états portent sur le plus gros UTXO.`,
+      "p.deposit": "Envoie des tKAS du wallet owner vers le coffre. Chaque dépôt crée un UTXO avec sa propre horloge.",
+      "p.withdraw": "Retrait courant, plafonné ; le reste revient au coffre dans un nouvel UTXO.",
+      "p.withdrawAll": "Retire tout l'UTXO, après un délai 3 fois plus long.",
+      "p.recoverByInactivity": "La clé de secours récupère les fonds après une longue inactivité.",
+      "p.recoverByDeadline": "Échéance absolue, qu'aucune activité ne peut repousser.",
+      "who.owner": "clé owner", "who.recovery": "clé de secours", "who.deposit": "clé owner → coffre",
+      always: "toujours possible", open: "déverrouillé", in: "dans", empty: "coffre vide",
+      see: "Voir la vraie transaction", signOff: "Signature désactivée en ligne",
+      nodata: "Aucun UTXO pour le moment.",
+      start: "Choisissez une étape de la session, ou lancez le rejeu.",
+      action: "Action", signedBy: "signée par", owner: "la clé owner", recovery: "la clé de secours",
+      fee: "Frais", seqLbl: "sequence (délai relatif)", lock: "lock_time (échéance)", input: "Entrée", output: "Sortie", to: "Vers",
+      vault: "coffre", ownerW: "owner", recoveryW: "secours", detail: "Détail technique", explorerLink: "explorateur ↗",
+      indexer: "Les explorateurs peuvent afficher « introuvable » : l'indexeur public de Testnet-10 est bloqué depuis le 26/09.",
+      "att.cap": "Retrait au-dessus du plafond", "att.early": "Retrait avant le délai", "att.wrongkey": "Secours signé avec la clé owner", "att.fee": "Frais excessifs (0,2 tKAS)", "att.sweep": "Tout retirer avant le délai",
+      show: "Voir", api: "API Testnet-10 injoignable, nouvel essai…", updated: "à jour",
+    },
+    en: {
+      "nav.back": "← Case study", title: "Vault console",
+      notice: "<b>Online, read-only version.</b> The real console runs locally and signs with keys that never leave my machine. Here, balances and delays are read live from Testnet-10, and the real session of 27 Sep can be replayed step by step.",
+      "s.bal": "Vault balance", "s.owner": "Owner wallet", "s.daa": "DAA score", "s.cap": "Cap / withdraw",
+      addr: "Vault address", explorer: "Explorer ↗",
+      "paths.title": "Spending paths", "utxo.title": "Vault UTXOs", "utxo.amount": "Amount", "utxo.age": "Age",
+      "insp.title": "Transaction inspector", "replay.title": "Replay the 27 Sep session",
+      "replay.hint": "Demo vault with short delays: all 4 paths accepted by the network and 5 attacks rejected, in 13 minutes.",
+      "replay.play": "▶ Replay", "replay.pause": "❚❚ Pause",
+      "att.title": "Protection tests", "att.hint": "Actual result of each attack during the session.",
+      footer: "Martino Ismaël · SilverScript vault on Kaspa Testnet-10 · <a href=\"../index.html\">Case study</a>",
+      "vault.main": "Main vault", "vault.demo": "Demo vault (27 Sep)",
+      hint: (p) => `Delays: withdraw ≈ ${dur(p.cooldown / DAA_PER_SEC)}, withdrawAll ≈ ${dur(p.cooldown * 3 / DAA_PER_SEC)}, inactivity ≈ ${dur(p.inactivity / DAA_PER_SEC)}, deadline on ${new Date(p.deadline).toLocaleString("en-GB")}. States refer to the largest UTXO.`,
+      "p.deposit": "Sends tKAS from the owner wallet to the vault. Each deposit is a UTXO with its own clock.",
+      "p.withdraw": "Everyday capped withdrawal; the change returns to the vault as a new UTXO.",
+      "p.withdrawAll": "Sweeps the whole UTXO, after a delay 3 times longer.",
+      "p.recoverByInactivity": "The recovery key takes the funds after a long period of inactivity.",
+      "p.recoverByDeadline": "Absolute deadline that no activity can push back.",
+      "who.owner": "owner key", "who.recovery": "recovery key", "who.deposit": "owner key → vault",
+      always: "always possible", open: "unlocked", in: "in", empty: "vault empty",
+      see: "See the real transaction", signOff: "Signing disabled online",
+      nodata: "No UTXO right now.",
+      start: "Pick a step of the session, or start the replay.",
+      action: "Action", signedBy: "signed by", owner: "the owner key", recovery: "the recovery key",
+      fee: "Fee", seqLbl: "sequence (relative delay)", lock: "lock_time (deadline)", input: "Input", output: "Output", to: "To",
+      vault: "vault", ownerW: "owner", recoveryW: "recovery", detail: "Technical detail", explorerLink: "explorer ↗",
+      indexer: "Explorers may show \"not found\": the public Testnet-10 indexer has been stalled since 26 Sep.",
+      "att.cap": "Withdrawal above the cap", "att.early": "Withdrawal before the delay", "att.wrongkey": "Recovery signed with the owner key", "att.fee": "Excessive fee (0.2 tKAS)", "att.sweep": "Sweep before the delay",
+      show: "Show", api: "Testnet-10 API unreachable, retrying…", updated: "updated",
+    },
+  };
+
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch { /* stockage indisponible */ } },
+  };
+  const urlLang = new URLSearchParams(location.search).get("lang");
+  if (urlLang === "fr" || urlLang === "en") store.set("site.lang", urlLang);
+  let lang = store.get("site.lang") === "en" ? "en" : "fr";
+  const t = (k) => I18N[lang][k] ?? I18N.fr[k] ?? k;
+  const L = (o) => (o ? o[lang] : "");
+  const $ = (id) => document.getElementById(id);
+  const esc = (x) => String(x).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+  const nf = () => new Intl.NumberFormat(lang === "fr" ? "fr-FR" : "en-US", { maximumFractionDigits: 8 });
+  const kas = (s) => nf().format(s / SOMPI);
+  const hhmm = (iso) => new Date(iso).toLocaleTimeString(lang === "fr" ? "fr-FR" : "en-GB");
+  function dur(sec) {
+    sec = Math.max(0, Math.round(sec));
+    const d = Math.floor(sec / 86400), h = Math.floor(sec % 86400 / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60;
+    const u = lang === "fr" ? ["j", "h", "min", "s"] : ["d", "h", "min", "s"];
+    if (d) return `${nf().format(d)} ${u[0]} ${h} ${u[1]}`;
+    if (h) return `${h} ${u[1]} ${m} ${u[2]}`;
+    if (m) return `${m} ${u[2]} ${s} ${u[3]}`;
+    return `${s} ${u[3]}`;
+  }
+
+  const PATHS = [
+    { mode: "deposit", who: "who.deposit" },
+    { mode: "withdraw", who: "who.owner", lock: "cooldown" },
+    { mode: "withdrawAll", who: "who.owner", lock: "all" },
+    { mode: "recoverByInactivity", who: "who.recovery", lock: "inactivity" },
+    { mode: "recoverByDeadline", who: "who.recovery", lock: "deadline" },
+  ];
+  let vaultId = "main", st = null, fetchedAt = 0, stepIdx = -1, timer = null;
+
+  function state(p) {
+    if (!p.lock) return { cls: "ok", text: t("always"), pct: 100, open: true };
+    const v = VAULTS[vaultId];
+    if (p.lock === "deadline") {
+      const rem = (v.deadline - Date.now()) / 1000;
+      return rem <= 0 ? { cls: "ok", text: t("open"), pct: 100, open: true } : { cls: "wait", text: `${t("in")} ${dur(rem)}`, pct: 0, open: false };
+    }
+    const u = st && st.utxos[0];
+    if (!u) return { cls: "bad", text: t("empty"), pct: 0, open: false };
+    const req = p.lock === "cooldown" ? v.cooldown : p.lock === "all" ? v.cooldown * 3 : v.inactivity;
+    const age = u.age + (Date.now() - fetchedAt) / 1000 * DAA_PER_SEC;
+    return age >= req ? { cls: "ok", text: t("open"), pct: 100, open: true } : { cls: "wait", text: `${t("in")} ${dur((req - age) / DAA_PER_SEC)}`, pct: Math.min(100, age / req * 100), open: false };
+  }
+
+  function renderPaths() {
+    $("paths").innerHTML = PATHS.map((p) => {
+      const s = state(p), real = SESSION.findIndex((x) => x.action === p.mode && x.ok);
+      return `<div class="card path" data-mode="${p.mode}">
+        <div class="path-head"><h3>${p.mode === "deposit" ? (lang === "fr" ? "dépôt" : "deposit") : p.mode}</h3><span class="who">${t(p.who)}</span><span class="pill ${s.cls}" data-pill>${s.text}</span></div>
+        <p>${t("p." + p.mode)}</p>
+        ${p.lock && p.lock !== "deadline" ? `<div class="bar"><i data-bar class="${s.open ? "done" : ""}" style="width:${s.pct}%"></i></div>` : ""}
+        <div class="row"><button class="btn small" type="button" data-step="${real}">${t("see")} →</button><span class="locked">🔒 ${t("signOff")}</span></div>
+      </div>`;
+    }).join("");
+  }
+  function tick() {
+    document.querySelectorAll(".path").forEach((el) => {
+      const s = state(PATHS.find((p) => p.mode === el.dataset.mode));
+      const pill = el.querySelector("[data-pill]"); pill.className = `pill ${s.cls}`; pill.textContent = s.text;
+      const bar = el.querySelector("[data-bar]"); if (bar) { bar.style.width = `${s.pct}%`; bar.className = s.open ? "done" : ""; }
+    });
+  }
+
+  function renderStatus() {
+    const v = VAULTS[vaultId];
+    $("addr").textContent = v.address;
+    $("explorer").href = `${EXPLORER}/addresses/${v.address}`;
+    $("sCap").innerHTML = `${kas(v.cap)} <small>tKAS</small>`;
+    $("pathsHint").textContent = I18N[lang].hint(v);
+    if (!st) return;
+    $("sBal").innerHTML = `${kas(st.balance)} <small>tKAS</small>`;
+    $("sOwner").innerHTML = `${kas(st.owner)} <small>tKAS</small>`;
+    $("sDaa").textContent = nf().format(st.daa);
+    $("utxoRows").innerHTML = st.utxos.length ? st.utxos.map((u) => `<tr>
+      <td class="mono"><a href="${EXPLORER}/transactions/${u.txid}" target="_blank" rel="noopener">${u.txid.slice(0, 8)}…:${u.index}</a></td>
+      <td>${kas(u.amount)} tKAS</td><td>${nf().format(u.age)} DAA · ${dur(u.age / DAA_PER_SEC)}</td></tr>`).join("")
+      : `<tr><td colspan="3" class="empty">${t("nodata")}</td></tr>`;
+    tick();
+  }
+
+  function renderInspector(i) {
+    const s = SESSION[i];
+    if (!s) { $("inspector").innerHTML = `<div class="result info">${t("start")}</div>`; return; }
+    if (s.action === "create") { $("inspector").innerHTML = `<div class="result info">${hhmm(s.at)} · ${esc(L(s.info))}</div>`; return; }
+    const head = `<div class="result ${s.ok ? "ok" : "bad"}">${s.ok ? "✓" : "✗"} ${esc(L(MSG[s.msg]))}</div>`;
+    const link = s.txid ? ` <a href="${EXPLORER}/transactions/${s.txid}" target="_blank" rel="noopener">${t("explorerLink")}</a>` : "";
+    const lbl = { vault: t("vault"), owner: t("ownerW"), recovery: t("recoveryW") };
+    $("inspector").innerHTML = `${head}
+      <dl class="kv">
+        <dt>${t("action")}</dt><dd><code>${s.action}</code> · ${hhmm(s.at)} · ${t("signedBy")} ${s.signer === "recovery" || (s.attack !== "wrongkey" && s.action.startsWith("recover")) ? t("recovery") : t("owner")}</dd>
+        ${s.txid ? `<dt>txid</dt><dd class="mono">${s.txid}${link}</dd>` : ""}
+        ${s.fee ? `<dt>${t("fee")}</dt><dd>${kas(s.fee)} tKAS</dd>` : ""}
+        ${s.seq !== undefined ? `<dt>${t("seqLbl")}</dt><dd>${nf().format(s.seq)}</dd>` : ""}
+        ${s.lockTime ? `<dt>${t("lock")}</dt><dd>${new Date(s.lockTime).toLocaleString(lang === "fr" ? "fr-FR" : "en-GB")}</dd>` : ""}
+      </dl>
+      ${s.note ? `<p class="hint">${esc(L(s.note))}</p>` : ""}
+      ${s.outputs ? `<table><thead><tr><th>${t("output")}</th><th>tKAS</th><th>${t("to")}</th></tr></thead><tbody>
+        ${s.input ? `<tr><td>${t("input")}</td><td>${kas(s.input)}</td><td><span class="tag">${t("vault")}</span></td></tr>` : ""}
+        ${s.outputs.map(([a, to], n) => `<tr><td>#${n}</td><td>${kas(a)}</td><td><span class="tag ${to === "vault" ? "" : "grey"}">${lbl[to]}</span></td></tr>`).join("")}
+      </tbody></table>` : ""}
+      ${s.detail ? `<details><summary>${t("detail")}</summary><pre>${esc(s.detail)}</pre></details>` : ""}
+      ${s.txid ? `<p class="hint" style="margin-top:8px">${t("indexer")}</p>` : ""}`;
+  }
+
+  function renderSteps() {
+    $("steps").innerHTML = SESSION.map((s, i) => `<li data-step="${i}" class="${i === stepIdx ? "cur" : ""}">
+      <span class="mk ${s.ok ? "ok" : "bad"}">${s.ok ? "✓" : "✗"}</span><span class="when">${hhmm(s.at)}</span><span class="mono">${s.action}${s.attack ? " ⚔" : ""}</span></li>`).join("");
+    $("stepCount").textContent = stepIdx >= 0 ? `${stepIdx + 1} / ${SESSION.length}` : `${SESSION.length}`;
+    const cur = $("steps").querySelector(".cur"); if (cur) cur.scrollIntoView({ block: "nearest" });
+  }
+  function go(i) { stepIdx = Math.max(0, Math.min(SESSION.length - 1, i)); renderInspector(stepIdx); renderSteps(); }
+
+  const ATTACKS = ["cap", "early", "wrongkey", "fee", "sweep"];
+  function renderAttacks() {
+    $("attacks").innerHTML = ATTACKS.map((a) => {
+      const i = SESSION.findIndex((s) => s.attack === a), s = SESSION[i];
+      return `<div class="attack"><div>${t("att." + a)}<small>${s.stage === "local" ? (lang === "fr" ? "refusée par le contrat" : "rejected by the contract") : (lang === "fr" ? "refusée par le réseau" : "rejected by the network")}</small></div>
+        <span class="pill bad" style="margin:0">✗</span><button class="btn small" type="button" data-step="${i}">${t("show")}</button></div>`;
+    }).join("");
+  }
+
+  function play() {
+    if (timer) { clearInterval(timer); timer = null; $("playBtn").textContent = t("replay.play"); return; }
+    if (stepIdx >= SESSION.length - 1) stepIdx = -1;
+    $("playBtn").textContent = t("replay.pause");
+    go(stepIdx + 1);
+    timer = setInterval(() => {
+      if (stepIdx >= SESSION.length - 1) { clearInterval(timer); timer = null; $("playBtn").textContent = t("replay.play"); return; }
+      go(stepIdx + 1);
+    }, 2600);
+  }
+
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.title = lang === "en" ? "Kaspa vault console | Martino Ismaël" : "Console du coffre Kaspa | Martino Ismaël";
+    document.querySelectorAll("[data-i18n]").forEach((el) => { el.innerHTML = t(el.dataset.i18n); });
+    document.querySelectorAll(".lang-switch [data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+    if (timer) $("playBtn").textContent = t("replay.pause");
+    $("vaultSel").innerHTML = `<option value="main">${t("vault.main")}</option><option value="demo">${t("vault.demo")}</option>`;
+    $("vaultSel").value = vaultId;
+    renderPaths(); renderStatus(); renderAttacks(); renderSteps(); renderInspector(stepIdx);
+  }
+
+  async function getJSON(path) { const r = await fetch(API + path); if (!r.ok) throw new Error(r.status); return r.json(); }
+  async function refresh() {
+    const v = VAULTS[vaultId];
+    try {
+      const [dag, vu, ou] = await Promise.all([getJSON("/info/blockdag"), getJSON(`/addresses/${v.address}/utxos`), getJSON(`/addresses/${OWNER}/utxos`)]);
+      const daa = Number(dag.virtualDaaScore);
+      const utxos = vu.map((u) => ({ txid: u.outpoint.transactionId, index: u.outpoint.index, amount: Number(u.utxoEntry.amount), age: daa - Number(u.utxoEntry.blockDaaScore) }))
+        .sort((a, b) => b.amount - a.amount);
+      st = { daa, utxos, balance: utxos.reduce((s, u) => s + u.amount, 0), owner: ou.reduce((s, u) => s + Number(u.utxoEntry.amount), 0) };
+      fetchedAt = Date.now();
+      renderStatus();
+    } catch {
+      $("pathsHint").textContent = t("api");
+    }
+  }
+
+  document.addEventListener("click", (e) => {
+    const b = e.target.closest("[data-step]"); if (b) { if (timer) play(); go(Number(b.dataset.step)); }
+  });
+  $("playBtn").addEventListener("click", play);
+  $("prevBtn").addEventListener("click", () => { if (timer) play(); go(stepIdx - 1); });
+  $("nextBtn").addEventListener("click", () => { if (timer) play(); go(stepIdx + 1); });
+  $("vaultSel").addEventListener("change", (e) => { vaultId = e.target.value; st = null; renderPaths(); renderStatus(); refresh(); });
+  document.querySelectorAll(".lang-switch [data-lang]").forEach((b) => b.addEventListener("click", () => { lang = b.dataset.lang; store.set("site.lang", lang); applyLang(); }));
+
+  applyLang();
+  refresh();
+  setInterval(refresh, REFRESH_MS);
+  setInterval(tick, 1000);
+})();
+</script>
+</body>
+</html>

@@ -42,6 +42,7 @@ window.SITE_I18N = {
     "tests d'intégration en Rust": "Rust integration tests",
     "failles trouvées et corrigées": "flaws found and fixed",
     "Étude de cas et coffre en direct": "Case study and live vault",
+    "Console du coffre": "Vault console",
     "Jeu vidéo rétro": "Retro video game",
     "Jeu développé en équipe : sprites, collisions, gameplay et interface utilisateur.": "Team-built game: sprites, collisions, gameplay and user interface.",
     "Portfolio personnel": "Personal portfolio",

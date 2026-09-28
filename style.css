@@ -123,6 +123,7 @@ section{scroll-margin-top:84px}
 .sub{font:500 12px var(--mono);text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin:40px 0 12px}
 .link{display:inline-flex;gap:8px;align-items:center;font-weight:500;color:var(--accent);text-decoration:none;border-bottom:1px solid currentColor;padding-bottom:1px}
 .link:hover{color:var(--ink)}
+.case-links{display:flex;flex-wrap:wrap;gap:12px 28px}
 
 /* Projet phare */
 .case{display:grid;grid-template-columns:260px minmax(0,1fr);gap:40px;padding-bottom:40px;border-bottom:1px solid var(--rule)}
