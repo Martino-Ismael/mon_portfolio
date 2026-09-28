@@ -1,0 +1,802 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Coffre Kaspa à verrou temporel | Martino Ismaël</title>
+<meta name="description" content="A time-locked savings vault written in SilverScript, deployed and tested live on Kaspa Testnet-10.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<meta name="theme-color" content="#f6f6f3">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%233a4048'/%3E%3Ctext x='50' y='66' font-family='monospace' font-weight='700' font-size='46' fill='%23ffffff' text-anchor='middle'%3EMI%3C/text%3E%3Crect x='22' y='76' width='56' height='6' fill='%234fbf8a'/%3E%3C/svg%3E">
+<style>
+:root {
+  --bg: #f6f6f3;
+  --surface: #ffffff;
+  --surface-2: #eeeeea;
+  --border: #dedfdb;
+  --text: #2a2f36;
+  --muted: #6a717b;
+  --accent: #0b5d3b;
+  --accent-soft: #e6efe9;
+  --ok: #1a8f4c;
+  --ok-soft: #dcf3e5;
+  --warn: #b26b00;
+  --warn-soft: #fbeed6;
+  --bad: #c0392b;
+  --bad-soft: #f9e0dd;
+  --code-bg: #2a2f36;
+  --code-text: #d6e2ee;
+  --shadow: 0 1px 2px rgba(16,24,32,.06), 0 4px 16px rgba(16,24,32,.05);
+  --radius: 4px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #1b1e22;
+    --surface: #23272c;
+    --surface-2: #2a2f35;
+    --border: #33383e;
+    --text: #eceae6;
+    --muted: #979ea6;
+    --accent: #5cc493;
+    --accent-soft: #16291f;
+    --ok: #4fce85;
+    --ok-soft: #133625;
+    --warn: #f0b04a;
+    --warn-soft: #3a2a10;
+    --bad: #f07a6c;
+    --bad-soft: #3d1a17;
+    --code-bg: #0a0f15;
+    --shadow: none;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #1b1e22;
+  --surface: #23272c;
+  --surface-2: #2a2f35;
+  --border: #33383e;
+  --text: #eceae6;
+  --muted: #979ea6;
+  --accent: #5cc493;
+  --accent-soft: #16291f;
+  --ok: #4fce85;
+  --ok-soft: #133625;
+  --warn: #f0b04a;
+  --warn-soft: #3a2a10;
+  --bad: #f07a6c;
+  --bad-soft: #3d1a17;
+  --code-bg: #0a0f15;
+  --shadow: none;
+  color-scheme: dark;
+}
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 16px/1.6 "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+code, pre, .mono { font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace; }
+.wrap { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+
+/* Nav */
+nav {
+  position: sticky; top: 0; z-index: 10;
+  background: color-mix(in srgb, var(--bg) 85%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--border);
+}
+nav .wrap { display: flex; align-items: center; gap: 20px; height: 60px; }
+.brand { font-weight: 700; display: flex; align-items: center; gap: 10px; color: var(--text); white-space: nowrap; }
+.brand { font-size: 20px; }
+.backlink { font: 500 13px "IBM Plex Mono", monospace; color: var(--muted); }
+.brand-mark { display: inline-grid; place-items: center; width: 30px; height: 30px; background: #3a4048; color: #fff; font: 600 12px "IBM Plex Mono", monospace; position: relative; }
+.brand-mark::after { content: ""; position: absolute; left: 6px; right: 6px; bottom: 4px; height: 2px; background: #1f9d61; }
+.navlinks { display: flex; gap: 18px; margin-left: auto; font-size: 14px; }
+.navlinks a { color: var(--muted); }
+.navlinks a:hover { color: var(--text); text-decoration: none; }
+.toggles { display: flex; gap: 6px; }
+.btn-ghost {
+  border: 1px solid var(--border); background: var(--surface); color: var(--text);
+  border-radius: 2px; padding: 6px 10px; font: inherit; font-size: 13px; cursor: pointer;
+}
+.btn-ghost:hover { border-color: var(--accent); }
+.lang-switch { display: inline-flex; border: 1px solid var(--accent); }
+.theme-toggle { display: inline-grid; place-items: center; width: 30px; height: 30px; border: 1px solid var(--accent); background: transparent; color: var(--accent); cursor: pointer; }
+.theme-toggle:hover { background: var(--accent-soft); }
+.lang-switch button { font: 500 12px "IBM Plex Mono", monospace; letter-spacing: .04em; padding: 6px 10px; border: 0; background: transparent; color: var(--accent); cursor: pointer; }
+.lang-switch button[aria-pressed="true"] { background: var(--accent); color: var(--bg); }
+.lang-switch button:not([aria-pressed="true"]):hover { background: var(--accent-soft); }
+@media (max-width: 760px) { .navlinks { display: none; } .toggles { margin-left: auto; } }
+
+/* Hero */
+.hero { padding: 72px 0 40px; }
+.eyebrow { color: var(--accent); font-weight: 600; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; }
+h1, h2, h3, h4, .brand, .stat .value, .bigscore { font-family: "IBM Plex Sans", sans-serif; }
+h1 { font-size: clamp(34px, 6vw, 56px); line-height: 1.08; margin: 12px 0 18px; letter-spacing: -.04em; }
+.lede { font-size: 19px; color: var(--muted); max-width: 720px; margin: 0; }
+.badges { display: flex; flex-wrap: wrap; gap: 8px; margin: 26px 0 30px; }
+.badge {
+  display: inline-flex; align-items: center; gap: 6px;
+  border: 1px solid var(--border); background: var(--surface);
+  border-radius: 2px; padding: 5px 12px; font: 500 12.5px "IBM Plex Mono", monospace;
+}
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+.dot.live { background: var(--ok); box-shadow: 0 0 0 0 var(--ok); animation: pulse 2s infinite; }
+@keyframes pulse { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--ok) 60%, transparent); } 100% { box-shadow: 0 0 0 8px transparent; } }
+@media (prefers-reduced-motion: reduce) { .dot.live { animation: none; } html { scroll-behavior: auto; } }
+.cta { display: flex; flex-wrap: wrap; gap: 10px; }
+.btn {
+  display: inline-flex; align-items: center; gap: 8px; border-radius: 2px; padding: 11px 18px;
+  font-weight: 600; font-size: 15px; border: 1px solid transparent;
+}
+.btn.primary { background: var(--accent); color: #fff; }
+:root[data-theme="dark"] .btn.primary { color: #06140d; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) .btn.primary { color: #06140d; } }
+.btn.secondary { border-color: var(--border); background: var(--surface); color: var(--text); }
+.btn:hover { text-decoration: none; filter: brightness(1.05); }
+
+/* Sections */
+section { padding: 48px 0; }
+h2 { font-size: 28px; letter-spacing: -.01em; margin: 0 0 8px; }
+.sub { color: var(--muted); margin: 0 0 28px; max-width: 720px; }
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+.grid { display: grid; gap: 16px; }
+.g4 { grid-template-columns: repeat(4, 1fr); }
+.g2 { grid-template-columns: repeat(2, 1fr); }
+@media (max-width: 900px) { .g4 { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px) { .g4, .g2 { grid-template-columns: 1fr; } }
+
+/* Live */
+.stat { padding: 18px 20px; }
+.stat .label { color: var(--muted); font-size: 13px; font-weight: 500; }
+.stat .value { font-size: 26px; font-weight: 700; margin-top: 4px; font-variant-numeric: tabular-nums; }
+.stat .value small { font-size: 14px; color: var(--muted); font-weight: 500; }
+.addr {
+  display: flex; align-items: center; gap: 10px; flex-wrap: wrap;
+  padding: 14px 18px; margin: 16px 0;
+}
+.addr .mono { font-size: 13px; word-break: break-all; flex: 1 1 320px; }
+.status-line { display: flex; align-items: center; gap: 8px; color: var(--muted); font-size: 13px; margin-top: 10px; }
+.utxo { padding: 20px; margin-top: 16px; }
+.utxo-head { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 14px; }
+.utxo-head .amt { font-size: 20px; font-weight: 700; }
+.utxo-head .id { font-size: 12px; color: var(--muted); word-break: break-all; }
+.lock { display: grid; grid-template-columns: 180px 1fr 150px; gap: 12px; align-items: center; padding: 8px 0; border-top: 1px solid var(--border); font-size: 14px; }
+.lock:first-of-type { border-top: 0; }
+.lock .name { font-weight: 600; }
+.lock .name span { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+.bar { height: 8px; background: var(--surface-2); border-radius: 999px; overflow: hidden; }
+.bar > i { display: block; height: 100%; background: var(--accent); border-radius: 999px; transition: width .6s ease; }
+.bar > i.done { background: var(--ok); }
+.lock .eta { text-align: right; font-variant-numeric: tabular-nums; }
+.pill { display: inline-block; font-size: 12px; font-weight: 600; border-radius: 999px; padding: 2px 10px; }
+.pill.ok { background: var(--ok-soft); color: var(--ok); }
+.pill.wait { background: var(--warn-soft); color: var(--warn); }
+.pill.bad { background: var(--bad-soft); color: var(--bad); }
+@media (max-width: 640px) {
+  .lock { grid-template-columns: 1fr auto; }
+  .lock .bar { grid-column: 1 / -1; grid-row: 2; }
+}
+.empty, .error { padding: 22px; text-align: center; color: var(--muted); }
+
+/* Paths */
+.path { padding: 22px; display: flex; flex-direction: column; gap: 10px; }
+.path .sel { font-size: 12px; color: var(--muted); font-weight: 600; letter-spacing: .04em; text-transform: uppercase; }
+.path h3 { margin: 0; font-size: 18px; font-family: "IBM Plex Mono", monospace; }
+.path p { margin: 0; color: var(--muted); font-size: 14px; }
+.kv { display: grid; grid-template-columns: auto 1fr; gap: 4px 12px; font-size: 13px; margin-top: 6px; }
+.kv dt { color: var(--muted); }
+.kv dd { margin: 0; font-weight: 500; }
+.tag { display: inline-block; font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; background: var(--accent-soft); color: var(--accent); }
+
+/* Flow */
+.flow { display: grid; grid-template-columns: repeat(5, 1fr); gap: 0; }
+.step { padding: 18px; position: relative; }
+.step + .step { border-left: 1px dashed var(--border); }
+.step .n { width: 28px; height: 28px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; font-weight: 700; font-size: 13px; margin-bottom: 10px; }
+.step h4 { margin: 0 0 4px; font-size: 15px; }
+.step p { margin: 0; font-size: 13px; color: var(--muted); }
+.step code { font-size: 12px; }
+@media (max-width: 900px) {
+  .flow { grid-template-columns: 1fr; }
+  .step + .step { border-left: 0; border-top: 1px dashed var(--border); }
+}
+
+/* Security */
+.sec { padding: 22px; }
+.sec h3 { margin: 0 0 8px; font-size: 17px; display: flex; align-items: center; gap: 8px; }
+.sec p { margin: 0; color: var(--muted); font-size: 14px; }
+.sec .pill { margin-left: auto; }
+
+/* Evidence */
+.tablewrap { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: 14px; }
+th, td { text-align: left; padding: 12px 16px; border-bottom: 1px solid var(--border); vertical-align: top; }
+th { color: var(--muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .04em; background: var(--surface-2); }
+tr:last-child td { border-bottom: 0; }
+td .mono { font-size: 12px; color: var(--muted); }
+
+/* Tests */
+.tests { padding: 22px; }
+.testrow { display: grid; grid-template-columns: 1fr auto; gap: 10px; padding: 10px 0; border-top: 1px solid var(--border); font-size: 14px; }
+.testrow:first-child { border-top: 0; }
+.testrow b { font-variant-numeric: tabular-nums; }
+.bigscore { font-size: 56px; font-weight: 700; letter-spacing: -.03em; color: var(--ok); line-height: 1; }
+
+/* Code */
+pre {
+  margin: 0; background: var(--code-bg); color: var(--code-text); border-radius: var(--radius);
+  padding: 22px; overflow-x: auto; font-size: 13px; line-height: 1.65;
+}
+.k { color: #8fb3ff; } .f { color: #e8d18a; } .s { color: #7fd1a6; } .c { color: #6b7680; } .t { color: #c7a6ff; }
+
+footer { border-top: 1px solid var(--border); padding: 32px 0 48px; color: var(--muted); font-size: 14px; }
+footer .wrap { display: flex; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a class="brand" href="../../index.html#projets"><span class="brand-mark" aria-hidden="true">MI</span> <small class="backlink" data-i18n="nav.back">← Portfolio</small></a>
+    <div class="navlinks">
+      <a href="#live" data-i18n="nav.live">Live vault</a>
+      <a href="#design" data-i18n="nav.design">Design</a>
+      <a href="#security" data-i18n="nav.security">Security</a>
+      <a href="#evidence" data-i18n="nav.evidence">On-chain proof</a>
+      <a href="#code" data-i18n="nav.code">Code</a>
+    </div>
+    <div class="toggles">
+      <div class="lang-switch" role="group" aria-label="Langue / Language"><button type="button" data-lang="fr" aria-pressed="true">FR</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
+      <button class="theme-toggle" id="themeBtn" type="button" aria-label="Thème clair / sombre · Light / dark theme" aria-pressed="false"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg></button>
+    </div>
+  </div>
+</nav>
+
+<header class="hero" id="top">
+  <div class="wrap">
+    <div class="eyebrow" data-i18n="hero.eyebrow">Smart contract · Kaspa Testnet-10</div>
+    <h1 data-i18n="hero.title">A time-locked savings vault on Kaspa</h1>
+    <p class="lede" data-i18n="hero.lede">A covenant written in SilverScript that caps daily withdrawals, enforces cooldowns, and gives a cold backup key a way to recover funds, even if the main key is stolen. Deployed and tested against the real Testnet-10 network.</p>
+    <div class="badges">
+      <span class="badge"><span class="dot live" id="heroDot"></span><span data-i18n="badge.live">Live on Testnet-10</span></span>
+      <span class="badge"><span data-i18n="badge.tests">28 / 28 tests passing</span></span>
+      <span class="badge"><span data-i18n="badge.size">350-byte script</span></span>
+      <span class="badge"><span data-i18n="badge.paths">4 spending paths</span></span>
+    </div>
+    <div class="cta">
+      <a class="btn primary" href="#live" data-i18n="cta.live">See the live vault ↓</a>
+      <a class="btn secondary" href="#evidence" data-i18n="cta.proof">On-chain proof</a>
+    </div>
+  </div>
+</header>
+
+<section id="live">
+  <div class="wrap">
+    <h2 data-i18n="live.title">Live vault</h2>
+    <p class="sub" data-i18n="live.sub">Read directly from the Kaspa Testnet-10 public API in your browser, refreshed every 30 seconds. Each deposit is its own UTXO with its own clock: the progress bars show how close each spending path is to unlocking.</p>
+
+    <div class="grid g4">
+      <div class="card stat"><div class="label" data-i18n="stat.balance">Balance</div><div class="value" id="sBalance">…</div></div>
+      <div class="card stat"><div class="label" data-i18n="stat.utxos">UTXOs</div><div class="value" id="sUtxos">…</div></div>
+      <div class="card stat"><div class="label" data-i18n="stat.daa">Network DAA score</div><div class="value" id="sDaa">…</div></div>
+      <div class="card stat"><div class="label" data-i18n="stat.cap">Withdraw cap</div><div class="value">100 <small>tKAS / <span data-i18n="unit.day">day</span></small></div></div>
+    </div>
+
+    <div class="card addr">
+      <span class="tag" data-i18n="addr.tag">Vault address (P2SH)</span>
+      <span class="mono" id="vaultAddr"></span>
+      <button class="btn-ghost" id="copyBtn" type="button" data-i18n="addr.copy">Copy</button>
+      <a class="btn-ghost" id="explorerLink" target="_blank" rel="noopener" data-i18n="addr.explorer">Explorer ↗</a>
+    </div>
+
+    <div id="utxoList"></div>
+    <div class="status-line"><span class="dot" id="statusDot"></span><span id="statusText">…</span></div>
+  </div>
+</section>
+
+<section id="design">
+  <div class="wrap">
+    <h2 data-i18n="paths.title">Four ways to spend, and nothing else</h2>
+    <p class="sub" data-i18n="paths.sub">Every path checks its signature first, then its time lock. There is no admin path that skips either one.</p>
+    <div class="grid g2">
+      <div class="card path">
+        <div class="sel"><span data-i18n="sel">selector</span> 0 · <span data-i18n="who.owner">owner key</span></div>
+        <h3>withdraw</h3>
+        <p data-i18n="p0.desc">Everyday withdrawal. The amount is capped, exact output amounts are enforced, and the change must return to the exact same vault script.</p>
+        <dl class="kv">
+          <dt data-i18n="kv.lock">Lock</dt><dd><span data-i18n="p0.lock">relative, 864,000 DAA (≈ 1 day)</span></dd>
+          <dt data-i18n="kv.limit">Limit</dt><dd><span data-i18n="p0.limit">≤ 100 tKAS, miner fee ≤ 0.1 tKAS</span></dd>
+        </dl>
+      </div>
+      <div class="card path">
+        <div class="sel"><span data-i18n="sel">selector</span> 1 · <span data-i18n="who.owner">owner key</span></div>
+        <h3>withdrawAll</h3>
+        <p data-i18n="p1.desc">Full sweep by the owner, behind a longer guard delay, so a stolen key cannot drain the vault instantly.</p>
+        <dl class="kv">
+          <dt data-i18n="kv.lock">Lock</dt><dd><span data-i18n="p1.lock">relative, 3 × cooldown (≈ 3 days)</span></dd>
+          <dt data-i18n="kv.limit">Limit</dt><dd><span data-i18n="p1.limit">none</span></dd>
+        </dl>
+      </div>
+      <div class="card path">
+        <div class="sel"><span data-i18n="sel">selector</span> 2 · <span data-i18n="who.recovery">recovery key</span></div>
+        <h3>recoverByInactivity</h3>
+        <p data-i18n="p2.desc">The cold backup key takes over once the vault has been idle long enough, which covers a lost owner key.</p>
+        <dl class="kv">
+          <dt data-i18n="kv.lock">Lock</dt><dd><span data-i18n="p2.lock">relative, 155,520,000 DAA (≈ 180 days)</span></dd>
+          <dt data-i18n="kv.limit">Limit</dt><dd><span data-i18n="p1.limit">none</span></dd>
+        </dl>
+      </div>
+      <div class="card path">
+        <div class="sel"><span data-i18n="sel">selector</span> 3 · <span data-i18n="who.recovery">recovery key</span></div>
+        <h3>recoverByDeadline</h3>
+        <p data-i18n="p3.desc">Absolute fallback date that no amount of activity can push back. It closes the "drip" attack described below.</p>
+        <dl class="kv">
+          <dt data-i18n="kv.lock">Lock</dt><dd><span data-i18n="p3.lock">absolute, 1 Jan 2030 (CLTV, Unix ms)</span></dd>
+          <dt data-i18n="kv.limit">Limit</dt><dd><span data-i18n="p1.limit">none</span></dd>
+        </dl>
+      </div>
+    </div>
+
+    <h2 style="margin-top:56px" data-i18n="flow.title">How a transaction is made</h2>
+    <p class="sub" data-i18n="flow.sub">No wallet can spend a custom covenant, so the project ships its own tool chain. Every transaction is executed locally in the same script engine as a Kaspa node before it is broadcast.</p>
+    <div class="card flow">
+      <div class="step"><div class="n">1</div><h4 data-i18n="f1.t">Contract</h4><p data-i18n="f1.d"><code>vault.sil</code>, compiled by the SilverScript v1.0 compiler.</p></div>
+      <div class="step"><div class="n">2</div><h4 data-i18n="f2.t">Setup</h4><p data-i18n="f2.d"><code>vault_setup</code> (Rust) generates keys, fills the constructor, and derives the P2SH address.</p></div>
+      <div class="step"><div class="n">3</div><h4 data-i18n="f3.t">Build &amp; sign</h4><p data-i18n="f3.d"><code>vault_tx</code> (Rust) signs with Schnorr and computes the post-Toccata mass.</p></div>
+      <div class="step"><div class="n">4</div><h4 data-i18n="f4.t">Local check</h4><p data-i18n="f4.d">Runs in <code>TxScriptEngine</code>. A failing script never leaves the machine.</p></div>
+      <div class="step"><div class="n">5</div><h4 data-i18n="f5.t">Broadcast</h4><p data-i18n="f5.d"><code>vault_net.py</code> fetches UTXOs, sets the fee, and submits to the REST API.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="security">
+  <div class="wrap">
+    <h2 data-i18n="sec.title">Security decisions</h2>
+    <p class="sub" data-i18n="sec.sub">An audit of the time-lock design found issues and fixed them, and the limits that remain are stated plainly.</p>
+    <div class="grid g2">
+      <div class="card sec">
+        <h3><span data-i18n="s1.t">The "drip" attack</span> <span class="pill ok" data-i18n="pill.fixed">Fixed</span></h3>
+        <p data-i18n="s1.d">Relative locks reset on every spend. A thief with the owner key could withdraw a little every day and keep the vault "active" forever, which would block recovery. The absolute-deadline path cannot be pushed back, and a test proves recovery still works on a freshly reset UTXO.</p>
+      </div>
+      <div class="card sec">
+        <h3><span data-i18n="s2.t">Fee that would never relay</span> <span class="pill ok" data-i18n="pill.fixed">Fixed</span></h3>
+        <p data-i18n="s2.d">The first version hard-coded a 1,000-sompi fee. The network minimum is 100 sompi per gram, and a withdraw weighs about 2,400 grams, so every withdraw would have been rejected. Fees are now free but capped at 0.1 tKAS, which bounds what a thief can burn.</p>
+      </div>
+      <div class="card sec">
+        <h3><span data-i18n="s3.t">Language constraint</span> <span class="pill ok" data-i18n="pill.handled">Handled</span></h3>
+        <p data-i18n="s3.d">In SilverScript v1.0, a time lock must be its own <code>require(TxVar &gt;= x)</code> statement and cannot be OR-ed. The "inactivity OR deadline" rule is therefore expressed as two entrypoints, and the OR happens in the choice of selector.</p>
+      </div>
+      <div class="card sec">
+        <h3><span data-i18n="s4.t">Known limits</span> <span class="pill wait" data-i18n="pill.accepted">Accepted</span></h3>
+        <p data-i18n="s4.d">A patient thief can still take 100 tKAS a day or sweep after 3 days, so fast detection matters. An off-chain watcher raises an alert within 60 seconds of any spend. Delays are counted in DAA score (≈ 10/s), so a future block-rate hard fork would shorten them and require migrating to a new vault.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="evidence">
+  <div class="wrap">
+    <h2 data-i18n="ev.title">On-chain proof</h2>
+    <p class="sub" data-i18n="ev.sub">Real transactions sent to Kaspa Testnet-10. The rejections matter as much as the successes: they show the network enforcing the vault's rules.</p>
+    <div class="card tablewrap">
+      <table>
+        <thead><tr><th data-i18n="ev.h1">Action</th><th data-i18n="ev.h2">Expected</th><th data-i18n="ev.h3">Network result</th></tr></thead>
+        <tbody>
+          <tr>
+            <td><span data-i18n="ev.r1">Deposit 400 tKAS</span><br><a class="mono" target="_blank" rel="noopener" href="https://tn10.kaspa.stream/transactions/ec11f64aa94d8c7813d575d168cc4efb88f19963708c9d517f74e6628e422d8a">ec11f64a…2d8a ↗</a></td>
+            <td data-i18n="ev.accepted">accepted</td>
+            <td><span class="pill ok">✓ <span data-i18n="ev.accepted">accepted</span></span></td>
+          </tr>
+          <tr>
+            <td><span data-i18n="ev.r2">Deposit 5 tKAS (alert test)</span><br><a class="mono" target="_blank" rel="noopener" href="https://tn10.kaspa.stream/transactions/c311eaf8030863996c4b094787572b348140c1566d546dbbd45d5fa71084419a">c311eaf8…419a ↗</a></td>
+            <td data-i18n="ev.accepted2">accepted, alert fired</td>
+            <td><span class="pill ok">✓ <span data-i18n="ev.alert">alert in &lt; 60 s</span></span></td>
+          </tr>
+          <tr>
+            <td data-i18n="ev.r3">withdraw 50 tKAS, UTXO 55 DAA old</td>
+            <td data-i18n="ev.rejected">rejected</td>
+            <td><span class="pill ok">✓ <span data-i18n="ev.rejected">rejected</span></span><br><span class="mono">sequence locks conditions was not met</span></td>
+          </tr>
+          <tr>
+            <td data-i18n="ev.r4">withdraw 150 tKAS (over the cap)</td>
+            <td data-i18n="ev.rejected">rejected</td>
+            <td><span class="pill ok">✓ <span data-i18n="ev.rejected">rejected</span></span><br><span class="mono">script ran, but verification failed</span></td>
+          </tr>
+          <tr>
+            <td data-i18n="ev.r5">withdrawAll before 3 days</td>
+            <td data-i18n="ev.rejected">rejected</td>
+            <td><span class="pill ok">✓ <span data-i18n="ev.rejected">rejected</span></span><br><span class="mono">sequence locks conditions was not met</span></td>
+          </tr>
+          <tr>
+            <td data-i18n="ev.r6">recoverByInactivity before 180 days</td>
+            <td data-i18n="ev.rejected">rejected</td>
+            <td><span class="pill ok">✓ <span data-i18n="ev.rejected">rejected</span></span><br><span class="mono">sequence locks conditions was not met</span></td>
+          </tr>
+          <tr>
+            <td data-i18n="ev.r7">recoverByDeadline before 2030</td>
+            <td data-i18n="ev.rejected">rejected</td>
+            <td><span class="pill ok">✓ <span data-i18n="ev.rejected">rejected</span></span><br><span class="mono">transaction input #0 is not finalized</span></td>
+          </tr>
+          <tr>
+            <td><span data-i18n="ev.d1"></span><br><a class="mono" target="_blank" rel="noopener" href="https://tn10.kaspa.stream/transactions/3b8dd4b924e9986e83d181aa0c7beeaf778a07c18ac20a4abc00cf1a767a5ffd">3b8dd4b9…5ffd ↗</a></td>
+            <td data-i18n="ev.accepted">accepted</td>
+            <td><span class="pill ok">✓ <span data-i18n="ev.accepted">accepted</span></span></td>
+          </tr>
+          <tr>
+            <td><span data-i18n="ev.d2"></span><br><a class="mono" target="_blank" rel="noopener" href="https://tn10.kaspa.stream/transactions/1de9ad851851e99c75f1a7bb489a35fcb44cbff56b322624d030e33cb1af52fd">1de9ad85…52fd ↗</a></td>
+            <td data-i18n="ev.accepted">accepted</td>
+            <td><span class="pill ok">✓ <span data-i18n="ev.accepted">accepted</span></span></td>
+          </tr>
+          <tr>
+            <td><span data-i18n="ev.d3"></span><br><a class="mono" target="_blank" rel="noopener" href="https://tn10.kaspa.stream/transactions/219ebe44008cd37c73c9e579e284e402f9afa110088d30c1fc9d5a630c32cb12">219ebe44…cb12 ↗</a></td>
+            <td data-i18n="ev.accepted">accepted</td>
+            <td><span class="pill ok">✓ <span data-i18n="ev.accepted">accepted</span></span></td>
+          </tr>
+          <tr>
+            <td><span data-i18n="ev.d4"></span><br><a class="mono" target="_blank" rel="noopener" href="https://tn10.kaspa.stream/transactions/e92667fd9a7eb4cb2d682f039897c1548f51433ff75932c0f9bbf3d31a68b7c6">e92667fd…b7c6 ↗</a></td>
+            <td data-i18n="ev.accepted">accepted</td>
+            <td><span class="pill ok">✓ <span data-i18n="ev.accepted">accepted</span></span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="tests">
+  <div class="wrap">
+    <div class="grid g2">
+      <div>
+        <h2 data-i18n="t.title">Test suite</h2>
+        <p class="sub" data-i18n="t.sub">Rust integration tests build real transactions, compute the real sighash, sign with Schnorr, and run Kaspa's script engine. They cover both the bare script and the P2SH form used on-chain.</p>
+        <div class="bigscore">28 / 28</div>
+        <p class="sub" style="margin-top:8px"><code>cargo test -p silverscript-lang --test vault_tests</code></p>
+      </div>
+      <div class="card tests">
+        <div class="testrow"><span data-i18n="t.r1">Valid paths</span><b>4</b></div>
+        <div class="testrow"><span data-i18n="t.r2">Expected rejections (cap, cooldown, zero/negative amount, wrong signer, balance)</span><b>9</b></div>
+        <div class="testrow"><span data-i18n="t.r3">Exact boundaries (&gt;=)</span><b>3</b></div>
+        <div class="testrow"><span data-i18n="t.r4">Drip-attack scenario</span><b>1</b></div>
+        <div class="testrow"><span data-i18n="t.r5">Capped miner fee</span><b>3</b></div>
+        <div class="testrow"><span data-i18n="t.r6">P2SH spends, as on-chain</span><b>6</b></div>
+        <div class="testrow"><span data-i18n="t.r7">Script size</span><b>2</b></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="code">
+  <div class="wrap">
+    <h2 data-i18n="c.title">The core of the contract</h2>
+    <p class="sub" data-i18n="c.sub">The <code>withdraw</code> path from <code>vault.sil</code>. Error messages in <code>require</code> cost nothing in bytecode.</p>
+<pre><span class="k">entry</span> <span class="f">withdraw</span>(<span class="t">sig</span> ownerSig, <span class="t">int</span> amount) {
+    <span class="f">require</span>(<span class="f">checkSig</span>(ownerSig, owner), <span class="s">"invalid owner signature"</span>);
+    <span class="f">require</span>(<span class="k">this</span>.ageDaa &gt;= withdrawCooldown, <span class="s">"cooldown not elapsed"</span>);
+
+    <span class="f">require</span>(amount &gt; <span class="t">0</span>, <span class="s">"invalid amount"</span>);
+    <span class="f">require</span>(amount &lt;= maxWithdrawAmount, <span class="s">"amount above cap"</span>);
+
+    <span class="t">int</span> inputValue = tx.inputs[<span class="k">this</span>.activeInputIndex].value;
+    <span class="f">require</span>(inputValue &gt; amount, <span class="s">"insufficient balance"</span>);
+    <span class="f">require</span>(tx.outputs[<span class="t">0</span>].value == amount, <span class="s">"wrong output amount"</span>);
+
+    <span class="c">// Everything except `amount` and at most MAX_MINER_FEE goes back to the vault.</span>
+    <span class="t">int</span> minChangeValue = inputValue - amount - MAX_MINER_FEE;
+    <span class="k">if</span> (minChangeValue &gt; <span class="t">0</span>) {
+        <span class="t">byte</span>[] vaultScriptPubKey = tx.inputs[<span class="k">this</span>.activeInputIndex].scriptPubKey;
+        <span class="f">require</span>(tx.outputs[<span class="t">1</span>].scriptPubKey == vaultScriptPubKey, <span class="s">"change must return to the vault"</span>);
+        <span class="f">require</span>(tx.outputs[<span class="t">1</span>].value &gt;= minChangeValue, <span class="s">"fee above the allowed maximum"</span>);
+    }
+}</pre>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span><a href="../../index.html">Martino Ismaël</a> · <span data-i18n="foot.stack">SilverScript v1.0 · Rust · Python · Kaspa Testnet-10 REST API</span></span>
+    <span data-i18n="foot.note">Testnet only, with test coins. Not audited for real funds.</span>
+  </div>
+</footer>
+
+<script>
+(() => {
+  // ---- Vault parameters (must match ctor.json) ----
+  const VAULT = "kaspatest:pra2t9p22r0jse30uu66937z7z8sg0qt5c3se4xac7jw98yqutt4wrly4z4eg";
+  const API = "https://api-tn10.kaspa.org";
+  const EXPLORER = "https://tn10.kaspa.stream";
+  const SOMPI = 1e8;
+  const DAA_PER_SEC = 10;
+  const LOCKS = [
+    { key: "withdraw", daa: 864000 },
+    { key: "withdrawAll", daa: 864000 * 3 },
+    { key: "recoverByInactivity", daa: 155520000 },
+  ];
+  const DEADLINE_MS = 1893456000000; // 2030-01-01T00:00:00Z
+  const REFRESH_MS = 30000;
+
+  const I18N = {
+    en: {
+      "nav.back": "← Portfolio", "nav.live": "Live vault", "nav.design": "Design", "nav.security": "Security", "nav.evidence": "On-chain proof", "nav.code": "Code",
+      "hero.eyebrow": "Smart contract · Kaspa Testnet-10",
+      "hero.title": "A time-locked savings vault on Kaspa",
+      "hero.lede": "A covenant written in SilverScript that caps daily withdrawals, enforces cooldowns, and gives a cold backup key a way to recover funds, even if the main key is stolen. Deployed and tested against the real Testnet-10 network.",
+      "badge.live": "Live on Testnet-10", "badge.tests": "28 / 28 tests passing", "badge.size": "350-byte script", "badge.paths": "4 spending paths",
+      "cta.live": "See the live vault ↓", "cta.proof": "On-chain proof",
+      "live.title": "Live vault",
+      "live.sub": "Read directly from the Kaspa Testnet-10 public API in your browser, refreshed every 30 seconds. Each deposit is its own UTXO with its own clock: the progress bars show how close each spending path is to unlocking.",
+      "stat.balance": "Balance", "stat.utxos": "UTXOs", "stat.daa": "Network DAA score", "stat.cap": "Withdraw cap", "unit.day": "day",
+      "addr.tag": "Vault address (P2SH)", "addr.copy": "Copy", "addr.copied": "Copied", "addr.explorer": "Explorer ↗",
+      "paths.title": "Four ways to spend, and nothing else",
+      "paths.sub": "Every path checks its signature first, then its time lock. There is no admin path that skips either one.",
+      "sel": "selector", "who.owner": "owner key", "who.recovery": "recovery key", "kv.lock": "Lock", "kv.limit": "Limit",
+      "p0.desc": "Everyday withdrawal. The amount is capped, exact output amounts are enforced, and the change must return to the exact same vault script.",
+      "p0.lock": "relative, 864,000 DAA (≈ 1 day)", "p0.limit": "≤ 100 tKAS, miner fee ≤ 0.1 tKAS",
+      "p1.desc": "Full sweep by the owner, behind a longer guard delay, so a stolen key cannot drain the vault instantly.",
+      "p1.lock": "relative, 3 × cooldown (≈ 3 days)", "p1.limit": "none",
+      "p2.desc": "The cold backup key takes over once the vault has been idle long enough, which covers a lost owner key.",
+      "p2.lock": "relative, 155,520,000 DAA (≈ 180 days)",
+      "p3.desc": "Absolute fallback date that no amount of activity can push back. It closes the \"drip\" attack described below.",
+      "p3.lock": "absolute, 1 Jan 2030 (CLTV, Unix ms)",
+      "flow.title": "How a transaction is made",
+      "flow.sub": "No wallet can spend a custom covenant, so the project ships its own tool chain. Every transaction is executed locally in the same script engine as a Kaspa node before it is broadcast.",
+      "f1.t": "Contract", "f1.d": "<code>vault.sil</code>, compiled by the SilverScript v1.0 compiler.",
+      "f2.t": "Setup", "f2.d": "<code>vault_setup</code> (Rust) generates keys, fills the constructor, and derives the P2SH address.",
+      "f3.t": "Build &amp; sign", "f3.d": "<code>vault_tx</code> (Rust) signs with Schnorr and computes the post-Toccata mass.",
+      "f4.t": "Local check", "f4.d": "Runs in <code>TxScriptEngine</code>. A failing script never leaves the machine.",
+      "f5.t": "Broadcast", "f5.d": "<code>vault_net.py</code> fetches UTXOs, sets the fee, and submits to the REST API.",
+      "sec.title": "Security decisions",
+      "sec.sub": "An audit of the time-lock design found issues and fixed them, and the limits that remain are stated plainly.",
+      "pill.fixed": "Fixed", "pill.handled": "Handled", "pill.accepted": "Accepted",
+      "s1.t": "The \"drip\" attack",
+      "s1.d": "Relative locks reset on every spend. A thief with the owner key could withdraw a little every day and keep the vault \"active\" forever, which would block recovery. The absolute-deadline path cannot be pushed back, and a test proves recovery still works on a freshly reset UTXO.",
+      "s2.t": "Fee that would never relay",
+      "s2.d": "The first version hard-coded a 1,000-sompi fee. The network minimum is 100 sompi per gram, and a withdraw weighs about 2,400 grams, so every withdraw would have been rejected. Fees are now free but capped at 0.1 tKAS, which bounds what a thief can burn.",
+      "s3.t": "Language constraint",
+      "s3.d": "In SilverScript v1.0, a time lock must be its own <code>require(TxVar &gt;= x)</code> statement and cannot be OR-ed. The \"inactivity OR deadline\" rule is therefore expressed as two entrypoints, and the OR happens in the choice of selector.",
+      "s4.t": "Known limits",
+      "s4.d": "A patient thief can still take 100 tKAS a day or sweep after 3 days, so fast detection matters. An off-chain watcher raises an alert within 60 seconds of any spend. Delays are counted in DAA score (≈ 10/s), so a future block-rate hard fork would shorten them and require migrating to a new vault.",
+      "ev.title": "On-chain proof",
+      "ev.sub": "Real transactions sent to Kaspa Testnet-10. All four spending paths were accepted by the network, using a demo vault with short delays, and every forbidden action was rejected.",
+      "ev.h1": "Action", "ev.h2": "Expected", "ev.h3": "Network result",
+      "ev.r1": "Deposit 400 tKAS", "ev.r2": "Deposit 5 tKAS (alert test)", "ev.accepted": "accepted", "ev.accepted2": "accepted, alert fired",
+      "ev.alert": "alert in &lt; 60 s", "ev.rejected": "rejected",
+      "ev.r3": "withdraw 50 tKAS, UTXO 55 DAA old", "ev.r4": "withdraw 150 tKAS (over the cap)", "ev.r5": "withdrawAll before 3 days",
+      "ev.r6": "recoverByInactivity before 180 days", "ev.r7": "recoverByDeadline before 2030", "ev.r8": "withdraw 50 tKAS after 1 day",
+      "ev.scheduled": "⏳ scheduled",
+      "ev.d1": "Demo vault · withdraw 2 tKAS after the cooldown, change back to the vault",
+      "ev.d2": "Demo vault · withdrawAll after 3 × cooldown",
+      "ev.d3": "Demo vault · recoverByInactivity, signed by the backup key",
+      "ev.d4": "Demo vault · recoverByDeadline on a fresh UTXO (drip attack defeated)",
+      "t.title": "Test suite",
+      "t.sub": "Rust integration tests build real transactions, compute the real sighash, sign with Schnorr, and run Kaspa's script engine. They cover both the bare script and the P2SH form used on-chain.",
+      "t.r1": "Valid paths", "t.r2": "Expected rejections (cap, cooldown, zero/negative amount, wrong signer, balance)", "t.r3": "Exact boundaries (&gt;=)",
+      "t.r4": "Drip-attack scenario", "t.r5": "Capped miner fee", "t.r6": "P2SH spends, as on-chain", "t.r7": "Script size",
+      "c.title": "The core of the contract",
+      "c.sub": "The <code>withdraw</code> path from <code>vault.sil</code>. Error messages in <code>require</code> cost nothing in bytecode.",
+      "foot.stack": "SilverScript v1.0 · Rust · Python · Kaspa Testnet-10 REST API",
+      "foot.note": "Testnet only, with test coins. Not audited for real funds.",
+      // dynamic
+      "lock.withdraw": "withdraw", "lock.withdrawAll": "withdrawAll", "lock.recoverByInactivity": "recoverByInactivity", "lock.recoverByDeadline": "recoverByDeadline",
+      "lock.sub.withdraw": "≈ 1 day", "lock.sub.withdrawAll": "≈ 3 days", "lock.sub.recoverByInactivity": "≈ 180 days", "lock.sub.recoverByDeadline": "1 Jan 2030",
+      "state.open": "unlocked", "state.in": "in", "age": "age", "empty": "The vault is empty right now.",
+      "status.ok": "Updated", "status.err": "Could not reach the Testnet-10 API. Retrying…", "status.loading": "Loading…",
+      "d": "d", "h": "h", "m": "min",
+    },
+    fr: {
+      "nav.back": "← Portfolio", "nav.live": "Coffre en direct", "nav.design": "Conception", "nav.security": "Sécurité", "nav.evidence": "Preuves on-chain", "nav.code": "Code",
+      "hero.eyebrow": "Smart contract · Kaspa Testnet-10",
+      "hero.title": "Un coffre d'épargne à verrou temporel sur Kaspa",
+      "hero.lede": "Un covenant écrit en SilverScript qui plafonne les retraits quotidiens, impose des délais et permet à une clé de secours hors ligne de récupérer les fonds, même si la clé principale est volée. Déployé et testé sur le vrai réseau Testnet-10.",
+      "badge.live": "En direct sur Testnet-10", "badge.tests": "28 / 28 tests réussis", "badge.size": "Script de 350 octets", "badge.paths": "4 chemins de dépense",
+      "cta.live": "Voir le coffre en direct ↓", "cta.proof": "Preuves on-chain",
+      "live.title": "Coffre en direct",
+      "live.sub": "Données lues par ton navigateur depuis l'API publique de Kaspa Testnet-10, actualisées toutes les 30 secondes. Chaque dépôt est un UTXO distinct avec sa propre horloge : les barres montrent où en est le déverrouillage de chaque chemin.",
+      "stat.balance": "Solde", "stat.utxos": "UTXO", "stat.daa": "Score DAA du réseau", "stat.cap": "Plafond de retrait", "unit.day": "jour",
+      "addr.tag": "Adresse du coffre (P2SH)", "addr.copy": "Copier", "addr.copied": "Copié", "addr.explorer": "Explorateur ↗",
+      "paths.title": "Quatre façons de dépenser, et rien d'autre",
+      "paths.sub": "Chaque chemin vérifie d'abord la signature, puis le verrou temporel. Aucun chemin « admin » ne contourne l'un ou l'autre.",
+      "sel": "sélecteur", "who.owner": "clé owner", "who.recovery": "clé de secours", "kv.lock": "Verrou", "kv.limit": "Limite",
+      "p0.desc": "Retrait courant. Le montant est plafonné, les montants de sortie sont exacts, et le reliquat doit revenir exactement au même script de coffre.",
+      "p0.lock": "relatif, 864 000 DAA (≈ 1 jour)", "p0.limit": "≤ 100 tKAS, frais ≤ 0,1 tKAS",
+      "p1.desc": "Retrait total par le propriétaire, derrière un délai plus long : une clé volée ne peut pas vider le coffre d'un coup.",
+      "p1.lock": "relatif, 3 × le délai (≈ 3 jours)", "p1.limit": "aucune",
+      "p2.desc": "La clé de secours prend le relais quand le coffre est resté inactif assez longtemps, par exemple si la clé owner est perdue.",
+      "p2.lock": "relatif, 155 520 000 DAA (≈ 180 jours)",
+      "p3.desc": "Date butoir absolue qu'aucune activité ne peut repousser. Elle neutralise l'attaque « goutte-à-goutte » décrite plus bas.",
+      "p3.lock": "absolu, 1er janvier 2030 (CLTV, ms Unix)",
+      "flow.title": "Comment une transaction est construite",
+      "flow.sub": "Aucun wallet ne sait dépenser un covenant sur mesure : le projet a donc ses propres outils. Chaque transaction est d'abord exécutée localement, dans le même moteur de script qu'un nœud Kaspa, avant d'être diffusée.",
+      "f1.t": "Contrat", "f1.d": "<code>vault.sil</code>, compilé par le compilateur SilverScript v1.0.",
+      "f2.t": "Préparation", "f2.d": "<code>vault_setup</code> (Rust) génère les clés, remplit le constructeur et calcule l'adresse P2SH.",
+      "f3.t": "Construction et signature", "f3.d": "<code>vault_tx</code> (Rust) signe en Schnorr et calcule la masse post-Toccata.",
+      "f4.t": "Vérification locale", "f4.d": "Exécution dans <code>TxScriptEngine</code>. Un script qui échoue ne quitte jamais la machine.",
+      "f5.t": "Diffusion", "f5.d": "<code>vault_net.py</code> récupère les UTXO, fixe les frais et envoie la transaction à l'API REST.",
+      "sec.title": "Décisions de sécurité",
+      "sec.sub": "L'audit du système de verrous a trouvé des failles, elles ont été corrigées, et les limites restantes sont assumées clairement.",
+      "pill.fixed": "Corrigé", "pill.handled": "Géré", "pill.accepted": "Assumé",
+      "s1.t": "L'attaque « goutte-à-goutte »",
+      "s1.d": "Les verrous relatifs repartent de zéro à chaque dépense. Un voleur avec la clé owner pourrait retirer un peu chaque jour et garder le coffre « actif » pour toujours, ce qui bloquerait la récupération. Le chemin à échéance absolue ne peut pas être repoussé, et un test prouve que la récupération marche même sur un UTXO fraîchement réinitialisé.",
+      "s2.t": "Des frais qui n'auraient jamais passé",
+      "s2.d": "La première version fixait les frais à 1 000 sompis. Le minimum du réseau est de 100 sompis par gramme, et un withdraw pèse environ 2 400 grammes : tous les retraits auraient été refusés. Les frais sont maintenant libres mais plafonnés à 0,1 tKAS, ce qui limite ce qu'un voleur peut brûler.",
+      "s3.t": "Contrainte du langage",
+      "s3.d": "En SilverScript v1.0, un verrou temporel doit être une instruction <code>require(TxVar &gt;= x)</code> à part entière, impossible à combiner avec un OU. La règle « inactivité OU échéance » est donc exprimée par deux entrypoints : le OU se fait dans le choix du sélecteur.",
+      "s4.t": "Limites connues",
+      "s4.d": "Un voleur patient peut encore prendre 100 tKAS par jour, ou tout retirer après 3 jours : la détection rapide est donc essentielle. Un surveillant hors-chaîne alerte en moins de 60 secondes après toute dépense. Les délais sont comptés en score DAA (≈ 10/s) : un futur hardfork qui accélérerait les blocs les raccourcirait, et il faudrait migrer vers un nouveau coffre.",
+      "ev.title": "Preuves on-chain",
+      "ev.sub": "De vraies transactions envoyées sur Kaspa Testnet-10. Les 4 chemins de dépense ont été acceptés par le réseau (coffre de démo aux délais courts), et chaque action interdite a été refusée.",
+      "ev.h1": "Action", "ev.h2": "Attendu", "ev.h3": "Résultat du réseau",
+      "ev.r1": "Dépôt de 400 tKAS", "ev.r2": "Dépôt de 5 tKAS (test d'alerte)", "ev.accepted": "accepté", "ev.accepted2": "accepté, alerte déclenchée",
+      "ev.alert": "alerte en &lt; 60 s", "ev.rejected": "refusé",
+      "ev.r3": "withdraw de 50 tKAS, UTXO âgé de 55 DAA", "ev.r4": "withdraw de 150 tKAS (au-dessus du plafond)", "ev.r5": "withdrawAll avant 3 jours",
+      "ev.r6": "recoverByInactivity avant 180 jours", "ev.r7": "recoverByDeadline avant 2030", "ev.r8": "withdraw de 50 tKAS après 1 jour",
+      "ev.scheduled": "⏳ programmé",
+      "ev.d1": "Coffre de démo · withdraw de 2 tKAS après le délai, reliquat renvoyé au coffre",
+      "ev.d2": "Coffre de démo · withdrawAll après 3 × le délai",
+      "ev.d3": "Coffre de démo · recoverByInactivity, signé par la clé de secours",
+      "ev.d4": "Coffre de démo · recoverByDeadline sur un UTXO récent (goutte-à-goutte déjoué)",
+      "t.title": "Suite de tests",
+      "t.sub": "Les tests d'intégration Rust construisent de vraies transactions, calculent le vrai sighash, signent en Schnorr et exécutent le moteur de script de Kaspa. Ils couvrent le script nu et la forme P2SH utilisée on-chain.",
+      "t.r1": "Chemins valides", "t.r2": "Refus attendus (plafond, délai, montant nul ou négatif, mauvais signataire, solde)", "t.r3": "Bornes exactes (&gt;=)",
+      "t.r4": "Scénario goutte-à-goutte", "t.r5": "Frais plafonnés", "t.r6": "Dépenses P2SH, comme on-chain", "t.r7": "Taille du script",
+      "c.title": "Le cœur du contrat",
+      "c.sub": "Le chemin <code>withdraw</code> de <code>vault.sil</code>. Les messages d'erreur de <code>require</code> ne coûtent rien en bytecode.",
+      "foot.stack": "SilverScript v1.0 · Rust · Python · API REST Kaspa Testnet-10",
+      "foot.note": "Testnet uniquement, avec des jetons de test. Non audité pour de vrais fonds.",
+      "lock.withdraw": "withdraw", "lock.withdrawAll": "withdrawAll", "lock.recoverByInactivity": "recoverByInactivity", "lock.recoverByDeadline": "recoverByDeadline",
+      "lock.sub.withdraw": "≈ 1 jour", "lock.sub.withdrawAll": "≈ 3 jours", "lock.sub.recoverByInactivity": "≈ 180 jours", "lock.sub.recoverByDeadline": "1er janv. 2030",
+      "state.open": "déverrouillé", "state.in": "dans", "age": "âge", "empty": "Le coffre est vide pour le moment.",
+      "status.ok": "Mis à jour", "status.err": "API Testnet-10 injoignable. Nouvel essai…", "status.loading": "Chargement…",
+      "d": "j", "h": "h", "m": "min",
+    },
+  };
+
+  const store = {
+    get(k) { try { return localStorage.getItem(k); } catch { return null; } },
+    set(k, v) { try { localStorage.setItem(k, v); } catch { /* stockage indisponible */ } },
+  };
+
+  // Langue partagee avec tout le portfolio (cle "site.lang", ?lang=en dans l'URL).
+  const urlLang = new URLSearchParams(location.search).get("lang");
+  if (urlLang === "fr" || urlLang === "en") store.set("site.lang", urlLang);
+  let lang = store.get("site.lang") === "en" ? "en" : "fr";
+  const t = (k) => (I18N[lang] && I18N[lang][k]) ?? I18N.en[k] ?? k;
+  let lastData = null;
+  let lastStatus = { key: "status.loading", at: null };
+
+  function applyLang() {
+    document.documentElement.lang = lang;
+    document.title = lang === "en" ? "Time-locked vault on Kaspa | Martino Ismaël" : "Coffre Kaspa à verrou temporel | Martino Ismaël";
+    document.querySelectorAll("[data-i18n]").forEach((el) => { el.innerHTML = t(el.dataset.i18n); });
+    document.querySelectorAll(".lang-switch [data-lang]").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === lang)));
+    if (lastData) render(lastData); else renderStatus();
+  }
+
+  // Theme
+  const themeBtn = document.getElementById("themeBtn");
+  // Theme partage avec tout le portfolio (cle "site.theme") ; sans choix, on suit l'appareil.
+  const savedTheme = store.get("site.theme");
+  if (savedTheme === "light" || savedTheme === "dark") document.documentElement.dataset.theme = savedTheme;
+  themeBtn.addEventListener("click", () => {
+    const dark = document.documentElement.dataset.theme
+      ? document.documentElement.dataset.theme === "dark"
+      : matchMedia("(prefers-color-scheme: dark)").matches;
+    const next = dark ? "light" : "dark";
+    document.documentElement.dataset.theme = next;
+    store.set("site.theme", next);
+  });
+  document.querySelectorAll(".lang-switch [data-lang]").forEach((b) => b.addEventListener("click", () => {
+    lang = b.dataset.lang;
+    store.set("site.lang", lang);
+    applyLang();
+  }));
+
+  // Address
+  document.getElementById("vaultAddr").textContent = VAULT;
+  document.getElementById("explorerLink").href = `${EXPLORER}/addresses/${VAULT}`;
+  document.getElementById("copyBtn").addEventListener("click", async (e) => {
+    try { await navigator.clipboard.writeText(VAULT); e.target.textContent = t("addr.copied"); setTimeout(() => (e.target.textContent = t("addr.copy")), 1500); } catch { /* presse-papiers indisponible */ }
+  });
+
+  const nf = () => new Intl.NumberFormat(lang === "fr" ? "fr-FR" : "en-US", { maximumFractionDigits: 2 });
+  function fmtDuration(sec) {
+    sec = Math.max(0, Math.round(sec));
+    const d = Math.floor(sec / 86400), h = Math.floor((sec % 86400) / 3600), m = Math.floor((sec % 3600) / 60);
+    if (d > 0) return `${nf().format(d)} ${t("d")} ${h} ${t("h")}`;
+    if (h > 0) return `${h} ${t("h")} ${m} ${t("m")}`;
+    return `${m} ${t("m")}`;
+  }
+
+  function lockRow(key, progress, remainingSec) {
+    const done = progress >= 1;
+    const pct = Math.min(100, Math.max(0, progress * 100));
+    return `<div class="lock">
+      <div class="name mono">${t("lock." + key)}<span>${t("lock.sub." + key)}</span></div>
+      <div class="bar" role="progressbar" aria-valuenow="${pct.toFixed(1)}" aria-valuemin="0" aria-valuemax="100"><i class="${done ? "done" : ""}" style="width:${pct.toFixed(2)}%"></i></div>
+      <div class="eta">${done ? `<span class="pill ok">✓ ${t("state.open")}</span>` : `<span class="pill wait">${t("state.in")} ${fmtDuration(remainingSec)}</span>`}</div>
+    </div>`;
+  }
+
+  function render({ daa, utxos }) {
+    const total = utxos.reduce((s, u) => s + u.amount, 0);
+    document.getElementById("sBalance").innerHTML = `${nf().format(total / SOMPI)} <small>tKAS</small>`;
+    document.getElementById("sUtxos").textContent = utxos.length;
+    document.getElementById("sDaa").textContent = nf().format(daa);
+
+    const list = document.getElementById("utxoList");
+    if (!utxos.length) {
+      list.innerHTML = `<div class="card empty">${t("empty")}</div>`;
+    } else {
+      const now = Date.now();
+      list.innerHTML = utxos
+        .slice()
+        .sort((a, b) => b.amount - a.amount)
+        .map((u) => {
+          const age = Math.max(0, daa - u.daa);
+          const rows = LOCKS.map((l) => lockRow(l.key, age / l.daa, (l.daa - age) / DAA_PER_SEC)).join("")
+            + lockRow("recoverByDeadline", now >= DEADLINE_MS ? 1 : 0, (DEADLINE_MS - now) / 1000);
+          return `<div class="card utxo">
+            <div class="utxo-head">
+              <div><div class="amt">${nf().format(u.amount / SOMPI)} tKAS</div>
+                <a class="id mono" href="${EXPLORER}/transactions/${u.txid}" target="_blank" rel="noopener">${u.txid.slice(0, 10)}…${u.txid.slice(-6)}:${u.index} ↗</a></div>
+              <div class="mono" style="font-size:13px;color:var(--muted)">${t("age")} ${nf().format(age)} DAA · ≈ ${fmtDuration(age / DAA_PER_SEC)}</div>
+            </div>${rows}</div>`;
+        })
+        .join("");
+    }
+    renderStatus();
+  }
+
+  function renderStatus() {
+    const ok = lastStatus.key === "status.ok";
+    document.getElementById("statusDot").className = "dot" + (ok ? " live" : "");
+    document.getElementById("heroDot").className = "dot" + (lastStatus.key === "status.err" ? "" : " live");
+    const at = lastStatus.at ? " · " + lastStatus.at.toLocaleTimeString(lang === "fr" ? "fr-FR" : "en-US") : "";
+    document.getElementById("statusText").textContent = t(lastStatus.key) + at;
+  }
+
+  async function getJSON(path) {
+    const r = await fetch(API + path, { headers: { Accept: "application/json" } });
+    if (!r.ok) throw new Error(r.status);
+    return r.json();
+  }
+
+  async function refresh() {
+    try {
+      const [dag, raw] = await Promise.all([getJSON("/info/blockdag"), getJSON(`/addresses/${VAULT}/utxos`)]);
+      lastData = {
+        daa: Number(dag.virtualDaaScore),
+        utxos: raw.map((u) => ({
+          txid: u.outpoint.transactionId,
+          index: u.outpoint.index,
+          amount: Number(u.utxoEntry.amount),
+          daa: Number(u.utxoEntry.blockDaaScore),
+        })),
+      };
+      lastStatus = { key: "status.ok", at: new Date() };
+      render(lastData);
+    } catch (err) {
+      lastStatus = { key: "status.err", at: new Date() };
+      if (lastData) render(lastData); else {
+        document.getElementById("utxoList").innerHTML = `<div class="card error">${t("status.err")}</div>`;
+        renderStatus();
+      }
+    }
+  }
+
+  applyLang();
+  refresh();
+  setInterval(refresh, REFRESH_MS);
+})();
+</script>
+</body>
+</html>

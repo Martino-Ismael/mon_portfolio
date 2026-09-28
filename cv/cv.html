@@ -1,154 +1,147 @@
 <!DOCTYPE html>
-<html lang="fr">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="style.css">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CV Martino Ismaël</title>
+    <title>CV · Martino Ismaël</title>
+    <meta name="description" content="CV of Martino Ismaël, IT student (BTS SIO) looking for an internship in development / web development.">
+    <meta name="theme-color" content="#f6f6f3">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%233a4048'/%3E%3Ctext x='50' y='66' font-family='monospace' font-weight='700' font-size='46' fill='%23ffffff' text-anchor='middle'%3EMI%3C/text%3E%3Crect x='22' y='76' width='56' height='6' fill='%234fbf8a'/%3E%3C/svg%3E">
+    <link rel="stylesheet" href="style.css">
+    <script src="../theme.js"></script>
 </head>
-
 <body>
-    <div class="container">
-        <div class="sidebar">
-            <div class="about-section">
-                <h2>About Me</h2>
-                <p>Motivated IT student pursuing a développement internship to develop practical knowledge and support
-                    développement infrastructures</p>
-            </div>
+    <header class="toolbar">
+        <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true">MI</span> <small>← Portfolio</small></a>
+        <div class="toolbar-actions">
+            <div class="lang-switch" role="group" aria-label="Langue / Language"><button type="button" data-lang="fr" aria-pressed="true">FR</button><button type="button" data-lang="en" aria-pressed="false">EN</button></div>
+            <button class="theme-toggle" type="button" aria-label="Thème clair / sombre · Light / dark theme" aria-pressed="false"><svg width="14" height="14" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M8 1.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg></button>
+            <a class="button button-secondary" href="Martino-Ismael-CV.pdf" download>Download PDF <span aria-hidden="true">↓</span></a>
+            <button class="button button-primary" type="button" onclick="window.print()">Print</button>
+        </div>
+    </header>
 
-            <div class="contact-section">
-                <h2>Contact</h2>
-                <div class="contact-item">
-                    <div>+33 7 66 85 11 55</div>
-                </div>
-                <div class="contact-item">
-                    <div>ismamartino28@gmail.com</div>
-                </div>
-                <div class="contact-item">
-                    <div>58 rue de la république<br>17300 Rochefort<br>FRANCE</div>
-                </div>
-            </div>
+    <main class="cv">
+        <header class="cv-header">
+            <p class="cv-goal">Looking for an internship in development / web development</p>
+            <h1>Martino Ismaël</h1>
+            <p class="cv-subtitle">IT student · 19 years old</p>
+        </header>
 
-            <div class="qualities-section">
-                <h2>Qualities</h2>
-                <ul>
-                    <li>Rigorous</li>
-                    <li>Autonomous</li>
-                    <li>Team spirit</li>
-                    <li>Initiative</li>
-                    <li>Reactive</li>
-                </ul>
-            </div>
+        <div class="cv-body">
+            <aside class="sidebar">
+                <section>
+                    <h2>About me</h2>
+                    <p>Motivated IT student looking for a web development internship to build practical skills and contribute to modern, user-focused applications.</p>
+                </section>
 
-            <div class="languages-section">
-                <h2>Languages</h2>
-                <div class="languages">
-                    <div class="language">
-                        <div>French</div><br>
-                         <ul>
-                            <li>native language</li>
-                        </ul>
+                <section>
+                    <h2>Contact</h2>
+                    <ul class="contact-list">
+                        <li><a href="tel:+33766851155">+33 7 66 85 11 55</a></li>
+                        <li><a href="mailto:ismamartino28@gmail.com">ismamartino28@gmail.com</a></li>
+                        <li class="url"><a href="https://martino-ismael.github.io/mon_portfolio/">martino-ismael.github.io/mon_portfolio</a></li>
+                        <li>Rochefort (17), FRANCE</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Qualities</h2>
+                    <ul class="dot-list">
+                        <li>Rigorous</li>
+                        <li>Autonomous</li>
+                        <li>Team spirit</li>
+                        <li>Initiative</li>
+                        <li>Reactive</li>
+                    </ul>
+                </section>
+
+                <section>
+                    <h2>Languages</h2>
+                    <div class="languages">
+                        <div><strong>French</strong><span>Native speaker</span></div>
+                        <div><strong>English</strong><span>Intermediate</span></div>
                     </div>
-                    <div class="language">
-                        <div>English</div><br>
+                </section>
+            </aside>
+
+            <div class="content">
+                <section>
+                    <h2 class="section-title">Education</h2>
+                    <article class="item">
+                        <div class="item-head"><h3>Two-year technical degree in IT services for organizations (BTS SIO)</h3><span class="date">2025 – 2027</span></div>
+                        <p class="place">Lycée Merleau-Ponty, 17300 Rochefort, FRANCE</p>
+                    </article>
+                    <article class="item">
+                        <div class="item-head"><h3>Bachelor of Technology in Computer Science (BUT Informatique)</h3><span class="date">2024 – 2025</span></div>
+                        <ul><li>1 year completed</li></ul>
+                        <p class="place">IUT La Rochelle, 17000 La Rochelle, FRANCE</p>
+                    </article>
+                    <article class="item">
+                        <div class="item-head"><h3>Baccalaureate in Management Sciences and Technologies – Information Systems specialization (STMG SIG)</h3><span class="date">2022 – 2024</span></div>
+                        <ul><li>Honors: with merit</li></ul>
+                        <p class="place">Lycée Antoine Roussin, 97414 Saint-Louis, La Réunion, FRANCE</p>
+                    </article>
+                </section>
+
+                <section>
+                    <h2 class="section-title">Projects</h2>
+                    <article class="item">
+                        <div class="item-head"><h3>Time-locked savings vault – Kaspa blockchain</h3><span class="date">2026</span></div>
                         <ul>
-                            <li>B1</li>
+                            <li>Smart contract in SilverScript: capped daily withdrawals, anti-theft delays and a backup recovery key</li>
+                            <li>28 Rust integration tests; signing and broadcast tools in Rust and Python; security audit that found and fixed 2 flaws</li>
+                            <li>Deployed and tested live on Kaspa Testnet-10, with a public dashboard on my <a href="https://martino-ismael.github.io/mon_portfolio/projets/kaspa-vault/">portfolio</a></li>
                         </ul>
+                    </article>
+                </section>
+
+                <section>
+                    <h2 class="section-title">Work experience</h2>
+                    <article class="item">
+                        <div class="item-head"><h3>Multi-skilled store employee – Lidl</h3><span class="date">2025 – Present</span></div>
+                        <p class="place">Customer service – Cashiering – Stock management – Teamwork</p>
+                    </article>
+                    <article class="item">
+                        <div class="item-head"><h3>Construction worker – Building sector</h3><span class="date">Apr 2022 – Jun 2022</span></div>
+                        <ul>
+                            <li>Apartment renovation, wall construction, tile installation</li>
+                            <li>Concrete pouring, hands-on teamwork</li>
+                        </ul>
+                    </article>
+                    <article class="item">
+                        <div class="item-head"><h3>Cleaning technician – Facility services</h3><span class="date">Sep 2021 – Feb 2022</span></div>
+                        <ul>
+                            <li>Ensured hygiene and cleanliness of facilities</li>
+                            <li>Floor cleaning, dusting, waste management</li>
+                        </ul>
+                    </article>
+                </section>
+
+                <section>
+                    <h2 class="section-title">Technical skills</h2>
+                    <div class="skills">
+                        <div>
+                            <h3>Programming languages</h3>
+                            <ul><li>Python</li><li>PHP</li><li>JavaScript</li><li>Java</li><li>HTML / CSS</li><li>C++ (beginner)</li></ul>
+                        </div>
+                        <div>
+                            <h3>Frameworks</h3>
+                            <ul><li>Laravel</li></ul>
+                        </div>
+                        <div>
+                            <h3>Tools</h3>
+                            <ul><li>Microsoft Office</li><li>Google Workspace</li><li>Canva</li></ul>
+                        </div>
                     </div>
-                </div>
+                </section>
             </div>
         </div>
-
-        <div class="main-content">
-            <div class="header">
-                <p style="text-align: left; font-size: 0.9em; margin-bottom: 10px;">LOOKING FOR AN INTERNSHIP IN
-                    DEVELOPPEMENT </p>
-                <h1>MARTINO ISMAËL</h1>
-                <p>STUDENT 18 YEARS OLD</p>
-            </div>
-
-            <div class="section-title">EDUCATION</div>
-
-            <div class="education-item">
-                <div class="item-header">
-                    <div class="item-title">TWO-YEAR TECHNICAL DEGREE IN IT FOR ORGANIZATIONS</div>
-                    <div class="item-date">2025-2027</div>
-                </div>
-                <div class="item-details">Lycée Merleau-Ponty, 17300 Rochefort, FRANCE</div>
-            </div>
-
-            <div class="education-item">
-                <div class="item-header">
-                    <div class="item-title">BACHELOR OF TECHNOLOGY IN COMPUTER SCIENCES</div>
-                    <div class="item-date">2024-2025</div>
-                </div>
-                <div class="item-details">
-                    • 1 year completed<br>
-                    IUT La Rochelle, 17000 La Rochelle, FRANCE
-                </div>
-            </div>
-
-            <div class="education-item">
-                <div class="item-header">
-                    <div class="item-title">BACCALAUREATE IN MANAGEMENT SCIENCES AND TECHNOLOGIES</div>
-                    <div class="item-date">2022-2024</div>
-                </div>
-                <div class="item-details">
-                    – INFORMATION SYSTEMS SPECIALIZATION<br>
-                    • Honors: with merit<br>
-                    Lycée Antoine Roussin, Saint-Louis 97414, La Réunion, FRANCE
-                </div>
-            </div>
-
-            <div class="section-title">WORK EXPERIENCE</div>
-
-            <div class="work-item">
-                <div class="item-header">
-                    <div class="item-title">MULTI-SKILLED STORE EMPLOYEE – LIDL</div>
-                    <div class="item-date">2025- Present</div>
-                </div>
-                <div class="item-details">Customer Service – Cashiering – Stock Management – Teamwork</div>
-            </div>
-
-            <div class="work-item">
-                <div class="item-header">
-                    <div class="item-title">CONSTRUCTION WORKER – BUILDING SECTOR</div>
-                    <div class="item-date">Apr 2022 – Jun 2022</div>
-                </div>
-                <div class="item-details">
-                    <ul>
-                        <li>Apartment renovation, wall construction, tile installation</li>
-                        <li>Concrete pouring, hands-on teamwork</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="work-item">
-                <div class="item-header">
-                    <div class="item-title">CLEANING TECHNICIAN – FACILITY SERVICES</div>
-                    <div class="item-date">Sep 2021 – Feb 2022</div>
-                </div>
-                <div class="item-details">
-                    <ul>
-                        <li>Ensured hygiene and cleanliness of facilities</li>
-                        <li>Floor cleaning, dusting, waste management</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="section-title">NUMERICAL SKILLS</div>
-            <div class="skills-grid">
-                <li>Python</li>
-                <li>Pack office</li>
-                <li>PHP</li>
-                <li>Canva</li>
-                <li>HTML/CSS/JAVASCRIPT</li>
-                <li>Google package</li>
-                <li>C++ (beginner)</li>
-            </div>
-        </div>
-    </div>
+    </main>
+    <script src="../lang/cv.js"></script>
+    <script src="../i18n.js"></script>
 </body>
-
 </html>
